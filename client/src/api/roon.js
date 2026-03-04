@@ -27,6 +27,14 @@ export function getTopTracks(params = {}) {
     return fetchJson(`${BASE}/stats/top-tracks${qs(params)}`);
 }
 
+export function getTopZones(params = {}) {
+    return fetchJson(`${BASE}/stats/top-zones${qs(params)}`);
+}
+
+export function getTopAlbums(params = {}) {
+    return fetchJson(`${BASE}/stats/top-albums${qs(params)}`);
+}
+
 export function getHistory(params = {}) {
     return fetchJson(`${BASE}/history${qs(params)}`);
 }

@@ -67,6 +67,14 @@ export default function TopTracks({ dateParams }) {
           }]}
           height={400}
           margin={{ bottom: 100, left: 50, right: 10, top: 20 }}
+          slotProps={{
+            legend: {
+              labelStyle: {
+                fill: '#ffffff',
+                fontSize: '12px'
+              }
+            }
+          }}
           sx={{
             '& .MuiChartsAxis-tickLabel': {
               fill: '#ffffff',
@@ -78,14 +86,13 @@ export default function TopTracks({ dateParams }) {
             '& .MuiChartsAxis-tick': {
               stroke: '#666'
             },
-            '& .MuiChartsLegend-root': {
-              '& .MuiChartsLegend-series': {
-                '& text': {
-                  fill: '#ffffff !important'
-                }
-              }
+            '& .MuiChartsLegend-root text': {
+              fill: '#ffffff !important'
             },
             '& .MuiChartsLegend-label': {
+              fill: '#ffffff !important'
+            },
+            '& text': {
               fill: '#ffffff !important'
             }
           }}

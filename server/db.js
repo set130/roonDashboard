@@ -100,6 +100,38 @@ function getTopTracks(from, to, limit = 50) {
   return stmt.all({ ...params, limit });
 }
 
+// ---------- Top Zones ----------
+function getTopZones(from, to, limit = 50) {
+  const { clause, params } = dateFilter(from, to);
+  const stmt = db.prepare(`
+    SELECT zone_name,
+           COUNT(*) as play_count,
+           SUM(played_secs) as total_secs
+    FROM plays
+    WHERE 1=1 ${clause}
+    GROUP BY zone_name
+    ORDER BY total_secs DESC
+    LIMIT @limit
+  `);
+  return stmt.all({ ...params, limit });
+}
+
+// ---------- Top Albums ----------
+function getTopAlbums(from, to, limit = 50) {
+  const { clause, params } = dateFilter(from, to);
+  const stmt = db.prepare(`
+    SELECT album, artist, image_key,
+           COUNT(*) as play_count,
+           SUM(played_secs) as total_secs
+    FROM plays
+    WHERE 1=1 ${clause}
+    GROUP BY album, artist
+    ORDER BY total_secs DESC
+    LIMIT @limit
+  `);
+  return stmt.all({ ...params, limit });
+}
+
 // ---------- Play Time ----------
 function getPlayTime(from, to) {
   const { clause, params } = dateFilter(from, to);
@@ -251,5 +283,5 @@ function getRecap(from, to) {
   };
 }
 
-module.exports = { db, insertPlay, getTopArtists, getTopTracks, getPlayTime, getHistory, getRecap };
+module.exports = { db, insertPlay, getTopArtists, getTopTracks, getTopZones, getTopAlbums, getPlayTime, getHistory, getRecap };
 

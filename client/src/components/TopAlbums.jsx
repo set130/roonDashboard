@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
-import { getTopArtists } from '../api/roon';
+import { getTopAlbums, imageUrl } from '../api/roon';
 
-export default function TopArtists({ dateParams }) {
+export default function TopAlbums({ dateParams }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    getTopArtists({ ...dateParams, limit: 20 })
+    getTopAlbums({ ...dateParams, limit: 10 })
       .then(setData)
       .catch((err) => {
-        console.error('Failed to fetch top artists:', err);
+        console.error('Failed to fetch top albums:', err);
         setData([]);
       })
       .finally(() => setLoading(false));
@@ -20,7 +20,7 @@ export default function TopArtists({ dateParams }) {
   if (loading) {
     return (
       <div className="card">
-        <h3>Top Artists</h3>
+        <h3>Top Albums</h3>
         <p className="empty-state">Loading...</p>
       </div>
     );
@@ -29,24 +29,24 @@ export default function TopArtists({ dateParams }) {
   if (!data || data.length === 0) {
     return (
       <div className="card">
-        <h3>Top Artists</h3>
+        <h3>Top Albums</h3>
         <p className="empty-state">No data yet — start listening!</p>
       </div>
     );
   }
 
   // Prepare data for MUI chart
-  const artistNames = data.map((a) => a.artist);
+  const albumNames = data.map((a) => a.album || 'Unknown Album');
   const playTimes = data.map((a) => Math.round(a.total_secs / 60)); // Convert to minutes
 
   return (
-    <div className="card top-artists-card">
-      <h3>Top Artists</h3>
+    <div className="card top-albums-card">
+      <h3>Top Albums</h3>
       <div className="chart-container" style={{ width: '100%', overflowX: 'auto' }}>
         <BarChart
           xAxis={[{
             scaleType: 'band',
-            data: artistNames,
+            data: albumNames,
             tickLabelStyle: {
               angle: -45,
               textAnchor: 'end',
@@ -63,10 +63,10 @@ export default function TopArtists({ dateParams }) {
           series={[{
             data: playTimes,
             label: 'Minutes',
-            color: '#e17055'
+            color: '#fdcb6e'
           }]}
-          height={500}
-          margin={{ bottom: 120, left: 50, right: 10, top: 20 }}
+          height={400}
+          margin={{ bottom: 100, left: 50, right: 10, top: 20 }}
           slotProps={{
             legend: {
               labelStyle: {
@@ -100,9 +100,15 @@ export default function TopArtists({ dateParams }) {
       </div>
       <div className="ranked-list">
         {data.map((a, i) => (
-          <div key={a.artist} className="ranked-item">
+          <div key={`${a.album}-${a.artist}`} className="ranked-item">
             <span className="rank">#{i + 1}</span>
-            <span className="ranked-name">{a.artist}</span>
+            {a.image_key && (
+              <img className="ranked-art" src={imageUrl(a.image_key, 40, 40)} alt="" />
+            )}
+            <div className="ranked-info">
+              <span className="ranked-name">{a.album || 'Unknown Album'}</span>
+              <span className="ranked-sub">{a.artist}</span>
+            </div>
             <span className="ranked-stats">
               {a.play_count} plays · {Math.round(a.total_secs / 60)}m
             </span>
