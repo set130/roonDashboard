@@ -329,6 +329,19 @@ body {
   border-radius: 3px;
   font-size: 12px;
   cursor: pointer;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Style the year dropdown options */
+.year-select option {
+  padding: 4px 6px;
+  background: #1f1f1f;
+  color: var(--text);
+}
+
+.year-select option:checked {
+  background: #2a2a2a;
 }
 
 .month-select:hover,

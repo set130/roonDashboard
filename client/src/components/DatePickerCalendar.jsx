@@ -111,9 +111,11 @@ export default function DatePickerCalendar({value, onChange, isOpen, onOpenChang
         'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
-    // Generate year options: 5 years before and 5 years after the current displayed year
+    // Generate year options: much wider range to allow scrolling to any year
+    // From 50 years ago to 10 years in the future
+    const currentYear = new Date().getFullYear();
     const yearOptions = [];
-    for (let i = displayYear - 5; i <= displayYear + 5; i++) {
+    for (let i = currentYear - 50; i <= currentYear + 10; i++) {
         yearOptions.push(i);
     }
 
