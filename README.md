@@ -105,7 +105,7 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for full deployment guide.
 
 ```bash
 # 1. On your server, run the setup script (one-time)
-curl https://raw.githubusercontent.com/youruser/roon-dashboard/main/deploy-setup.sh | sudo bash
+curl https://raw.githubusercontent.com/youruser/roon-dashboard/master/deploy-setup.sh | sudo bash
 
 # 2. Copy your project files
 scp -r . user@your-server-ip:/opt/roonDashboard/

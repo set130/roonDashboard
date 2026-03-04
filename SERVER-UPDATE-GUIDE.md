@@ -140,7 +140,7 @@ sudo chmod 644 roon-dashboard.sqlite*
 ```bash
 # If you have local changes on the server
 git stash              # Save local changes
-git pull origin main   # Pull updates
+git pull origin master # Pull updates
 git stash pop          # Reapply local changes
 ```
 

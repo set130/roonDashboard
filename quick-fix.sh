@@ -27,11 +27,11 @@ echo "Step 4: Detecting branch..."
 git fetch origin 2>/dev/null
 BRANCH=$(git remote show origin 2>/dev/null | grep "HEAD branch" | cut -d' ' -f5)
 if [ -z "$BRANCH" ]; then
-    # Fallback: check if main or master exists
-    if git ls-remote --heads origin main | grep -q main; then
-        BRANCH="main"
-    else
+    # Fallback: check if master or main exists
+    if git ls-remote --heads origin master | grep -q master; then
         BRANCH="master"
+    else
+        BRANCH="main"
     fi
 fi
 echo "✓ Using branch: $BRANCH"

@@ -225,10 +225,10 @@ The update.sh script now includes automatic permission fixes, so you shouldn't n
 
 ```bash
 # ✓ Good
-git pull origin main
+git pull origin master
 
 # ✗ Bad (creates root-owned files)
-sudo git pull origin main
+sudo git pull origin master
 ```
 
 If the repository was initially cloned with sudo, fix it once:

@@ -43,7 +43,7 @@ echo ""
 echo "[5/5] Checking git branch..."
 cd /opt/roonDashboard
 CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
-DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | grep "HEAD branch" | cut -d' ' -f5 || echo "main")
+DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | grep "HEAD branch" | cut -d' ' -f5 || echo "master")
 
 echo "    Current branch: $CURRENT_BRANCH"
 echo "    Remote default branch: $DEFAULT_BRANCH"

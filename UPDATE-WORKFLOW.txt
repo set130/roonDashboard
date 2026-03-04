@@ -14,7 +14,7 @@
 3. Commit and push to GitHub:
    git add .
    git commit -m "Description of changes"
-   git push origin main
+   git push origin master
 
 
 ┌────────────────────────────────────────────────────────────────┐

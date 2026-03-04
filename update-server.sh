@@ -9,7 +9,7 @@ cd /opt/roonDashboard || exit 1
 # - client/src/components/Recap.jsx (added prev, next, goTo functions)
 
 echo "[1] Pulling latest changes from git..."
-git pull origin main 2>/dev/null || echo "Note: Git pull skipped or failed, proceeding with manual copy"
+git pull origin master 2>/dev/null || echo "Note: Git pull skipped or failed, proceeding with manual copy"
 
 echo "[2] Rebuilding client..."
 cd client

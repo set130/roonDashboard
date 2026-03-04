@@ -8,7 +8,8 @@
 ssh user@your-server-ip
 
 # Download and run the setup script
-curl https://raw.githubusercontent.com/youruser/roon-dashboard/main/deploy-setup.sh | sudo bash
+```bash
+curl https://raw.githubusercontent.com/youruser/roon-dashboard/master/deploy-setup.sh | sudo bash
 
 # Follow the prompts to configure your setup
 ```
