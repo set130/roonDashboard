@@ -45,7 +45,7 @@ export default function TopTracks({ dateParams }) {
     <div className="card top-tracks-card">
       <h3>Top Tracks</h3>
       <div className="chart-container">
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={500}>
           <BarChart data={chartData} layout="vertical" margin={{ left: 10 }}>
             <XAxis type="number" tick={{ fontSize: 11, fill: '#999' }} />
             <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 12, fill: '#ccc' }} />

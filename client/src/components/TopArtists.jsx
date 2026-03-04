@@ -46,7 +46,7 @@ export default function TopArtists({ dateParams }) {
     <div className="card top-artists-card">
       <h3>Top Artists</h3>
       <div className="chart-container">
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={600}>
           <BarChart data={chartData} layout="vertical" margin={{ left: 10 }}>
             <XAxis type="number" tick={{ fontSize: 11, fill: '#999' }} />
             <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 12, fill: '#ccc' }} />
