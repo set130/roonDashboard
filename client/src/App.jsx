@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import History from './components/History';
+import Recap from './components/Recap';
 import DateRangePicker from './components/DateRangePicker';
 import ErrorBoundary from './ErrorBoundary';
 import './App.css';
@@ -20,6 +21,7 @@ export default function App() {
             <nav className="sidebar-nav">
               <NavLink to="/" end>Dashboard</NavLink>
               <NavLink to="/history">History</NavLink>
+              <NavLink to="/recap">Recap</NavLink>
             </nav>
           </aside>
           <main className="main">
@@ -30,6 +32,7 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Dashboard dateParams={dateParams} />} />
                 <Route path="/history" element={<History dateParams={dateParams} />} />
+                <Route path="/recap" element={<Recap dateParams={dateParams} />} />
               </Routes>
             </div>
           </main>

@@ -30,8 +30,11 @@ echo ""
 
 # Pull latest changes from GitHub
 echo "[3/8] Pulling latest changes from GitHub..."
+# Detect the default branch (main or master)
+DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | grep "HEAD branch" | cut -d' ' -f5 2>/dev/null || echo "main")
+echo "    Fetching from origin/$DEFAULT_BRANCH..."
 git fetch origin
-git pull origin main
+git pull origin $DEFAULT_BRANCH
 echo "    ✓ Code updated"
 echo ""
 
