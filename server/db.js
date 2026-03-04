@@ -78,9 +78,9 @@ function getTopArtists(from, to, limit = 50) {
     }
   }
 
-  // Sort and limit
+  // Sort and limit (by total listening time, not play count)
   return Object.values(artistStats)
-    .sort((a, b) => b.play_count - a.play_count)
+    .sort((a, b) => b.total_secs - a.total_secs)
     .slice(0, limit);
 }
 
@@ -94,7 +94,7 @@ function getTopTracks(from, to, limit = 50) {
     FROM plays
     WHERE 1=1 ${clause}
     GROUP BY track_title, artist
-    ORDER BY play_count DESC
+    ORDER BY total_secs DESC
     LIMIT @limit
   `);
   return stmt.all({ ...params, limit });
@@ -177,14 +177,14 @@ function getRecap(from, to) {
     }
   }
 
-  const topArtists = Object.values(artistStats).sort((a, b) => b.play_count - a.play_count);
+  const topArtists = Object.values(artistStats).sort((a, b) => b.total_secs - a.total_secs);
   const top_artist = topArtists[0] || null;
 
   // Top track
   const topTrackStmt = db.prepare(`
     SELECT track_title, artist, album, image_key, COUNT(*) as play_count, SUM(played_secs) as total_secs
     FROM plays WHERE 1=1 ${clause}
-    GROUP BY track_title, artist ORDER BY play_count DESC LIMIT 1
+    GROUP BY track_title, artist ORDER BY total_secs DESC LIMIT 1
   `);
   const top_track = topTrackStmt.get(params) || null;
 

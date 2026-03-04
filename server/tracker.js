@@ -1,6 +1,7 @@
 const { insertPlay } = require("./db");
 
 const MIN_PLAY_SECS = 30;
+const PAUSE_TIMEOUT_SECS = 60; // Commit play after 60 seconds of pause
 const zoneStates = {};
 
 function trackKey(nowPlaying) {
@@ -58,21 +59,77 @@ function handleZonesChanged(zones) {
     var key = trackKey(zone.now_playing);
     var prevState = zoneStates[zone.zone_id];
 
-    // Handle stopped, paused, or no content - commit and clean up
-    if (zone.state === "stopped" || zone.state === "paused" || !zone.now_playing) {
+    // Handle stopped or no content - commit and clean up
+    if (zone.state === "stopped" || !zone.now_playing) {
       if (prevState && prevState.track) {
+        // Clear any pending pause timeout
+        if (prevState.pauseTimeout) {
+          clearTimeout(prevState.pauseTimeout);
+        }
         commitPlay(prevState);
         delete zoneStates[zone.zone_id];
       }
       continue;
     }
 
+    // Handle paused state - don't commit immediately, set a timeout
+    if (zone.state === "paused") {
+      if (prevState && prevState.track && !prevState.pausedAt) {
+        // Track just paused
+        prevState.pausedAt = new Date();
+        prevState.state = "paused";
+        console.log("[Tracker] Track paused: " + prevState.track.track_title + " - will commit if paused for " + PAUSE_TIMEOUT_SECS + "s");
+
+        // Set timeout to commit if paused for too long
+        // Capture zone_id in closure
+        var capturedZoneId = zone.zone_id;
+        prevState.pauseTimeout = setTimeout(function() {
+          var state = zoneStates[capturedZoneId];
+          if (state && state.track) {
+            console.log("[Tracker] Pause timeout reached for: " + state.track.track_title);
+            commitPlay(state);
+            delete zoneStates[capturedZoneId];
+          }
+        }, PAUSE_TIMEOUT_SECS * 1000);
+      }
+      continue;
+    }
+
+    // Handle playing/loading state
     var prevKey = null;
     if (prevState && prevState.track) {
       prevKey = prevState.track.track_title + "|||" + prevState.track.artist + "|||" + prevState.track.album;
     }
+
+    // Check if this is a resume from pause
+    if (prevState && prevState.pausedAt && key === prevKey) {
+      // Resuming the same track after pause
+      var pauseDuration = Math.round((new Date() - prevState.pausedAt) / 1000);
+      console.log("[Tracker] Track resumed after " + pauseDuration + "s pause: " + prevState.track.track_title);
+
+      // Clear the pause timeout
+      if (prevState.pauseTimeout) {
+        clearTimeout(prevState.pauseTimeout);
+      }
+
+      // Add pause duration to start time to maintain accurate play time
+      prevState.startedAt = new Date(prevState.startedAt.getTime() + (pauseDuration * 1000));
+      prevState.pausedAt = null;
+      prevState.pauseTimeout = null;
+      prevState.state = zone.state;
+      prevState.seek_position = zone.now_playing.seek_position;
+      continue;
+    }
+
+    // Different track - commit previous and start new
     if (key !== prevKey) {
-      if (prevState && prevState.track) commitPlay(prevState);
+      if (prevState && prevState.track) {
+        // Clear any pending pause timeout
+        if (prevState.pauseTimeout) {
+          clearTimeout(prevState.pauseTimeout);
+        }
+        commitPlay(prevState);
+      }
       var trackInfo = extractTrackInfo(zone);
       zoneStates[zone.zone_id] = {
         zone_id: zone.zone_id,
@@ -81,9 +138,12 @@ function handleZonesChanged(zones) {
         startedAt: new Date(),
         state: zone.state,
         seek_position: zone.now_playing.seek_position,
+        pausedAt: null,
+        pauseTimeout: null,
       };
       console.log("[Tracker] Now playing: " + trackInfo.track_title + " by " + trackInfo.artist + " in " + zone.display_name);
     } else if (prevState) {
+      // Same track, just update state
       prevState.state = zone.state;
       prevState.seek_position = zone.now_playing.seek_position;
     }
@@ -95,6 +155,10 @@ function handleZonesRemoved(zone_ids) {
   for (var i = 0; i < zone_ids.length; i++) {
     var id = zone_ids[i];
     if (zoneStates[id]) {
+      // Clear any pending pause timeout
+      if (zoneStates[id].pauseTimeout) {
+        clearTimeout(zoneStates[id].pauseTimeout);
+      }
       commitPlay(zoneStates[id]);
       delete zoneStates[id];
     }
@@ -137,7 +201,12 @@ function flushAll() {
   console.log("[Tracker] Flushing all in-progress plays...");
   var keys = Object.keys(zoneStates);
   for (var i = 0; i < keys.length; i++) {
-    commitPlay(zoneStates[keys[i]]);
+    var state = zoneStates[keys[i]];
+    // Clear any pending pause timeout
+    if (state.pauseTimeout) {
+      clearTimeout(state.pauseTimeout);
+    }
+    commitPlay(state);
     delete zoneStates[keys[i]];
   }
 }
