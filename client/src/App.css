@@ -317,16 +317,24 @@ body {
   color: var(--text);
   border-radius: 3px;
   font-size: 12px;
+  cursor: pointer;
 }
 
-.year-input {
-  width: 70px;
+.year-select {
+  width: 80px;
   padding: 4px 6px;
   border: 1px solid var(--border);
   background: #1f1f1f;
   color: var(--text);
   border-radius: 3px;
   font-size: 12px;
+  cursor: pointer;
+}
+
+.month-select:hover,
+.year-select:hover {
+  border-color: #3a3a3a;
+  background: #252525;
 }
 
 .calendar-weekdays {

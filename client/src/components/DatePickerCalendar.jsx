@@ -2,6 +2,7 @@ import {useState, useEffect, useRef} from 'react';
 
 export default function DatePickerCalendar({value, onChange, isOpen, onOpenChange}) {
     const pickerRef = useRef(null);
+    const calendarPopupRef = useRef(null);
     const [displayYear, setDisplayYear] = useState(() => {
         if (value) {
             const parts = value.split('-');
@@ -30,6 +31,26 @@ export default function DatePickerCalendar({value, onChange, isOpen, onOpenChang
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isOpen, onOpenChange]);
+
+    // Handle scroll for year navigation
+    useEffect(() => {
+        if (!isOpen || !calendarPopupRef.current) return;
+
+        const handleWheel = (e) => {
+            e.preventDefault();
+            if (e.deltaY > 0) {
+                // Scroll down - go to next year
+                setDisplayYear(prev => prev + 1);
+            } else {
+                // Scroll up - go to previous year
+                setDisplayYear(prev => prev - 1);
+            }
+        };
+
+        const popup = calendarPopupRef.current;
+        popup.addEventListener('wheel', handleWheel, { passive: false });
+        return () => popup.removeEventListener('wheel', handleWheel);
+    }, [isOpen]);
 
     const handleDateClick = (day) => {
         const dateStr = `${displayYear}-${String(displayMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -90,6 +111,12 @@ export default function DatePickerCalendar({value, onChange, isOpen, onOpenChang
         'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
+    // Generate year options: 5 years before and 5 years after the current displayed year
+    const yearOptions = [];
+    for (let i = displayYear - 5; i <= displayYear + 5; i++) {
+        yearOptions.push(i);
+    }
+
     const displayValue = value || 'Pick date';
 
     return (
@@ -99,7 +126,7 @@ export default function DatePickerCalendar({value, onChange, isOpen, onOpenChang
             </button>
 
             {isOpen && (
-                <div className="calendar-popup">
+                <div className="calendar-popup" ref={calendarPopupRef}>
                     <div className="calendar-header">
                         <button onClick={handlePrevMonth} className="nav-btn">←</button>
 
@@ -109,13 +136,15 @@ export default function DatePickerCalendar({value, onChange, isOpen, onOpenChang
                             ))}
                         </select>
 
-                        <input
-                            type="number"
+                        <select
                             value={displayYear}
                             onChange={handleYearChange}
-                            className="year-input"
-                            placeholder="Year"
-                        />
+                            className="year-select"
+                        >
+                            {yearOptions.map((year) => (
+                                <option key={year} value={year}>{year}</option>
+                            ))}
+                        </select>
 
                         <button onClick={handleNextMonth} className="nav-btn">→</button>
                     </div>
