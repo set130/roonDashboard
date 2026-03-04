@@ -1,0 +1,20 @@
+[Unit]
+Description=Roon Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=set
+WorkingDirectory=/opt/roon-dashboard
+Environment="ROON_CORE_IP=100.90.5.35"
+Environment="PORT=3001"
+Environment="NODE_ENV=production"
+ExecStart=/usr/bin/node /opt/roon-dashboard/server/index.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
