@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart } from '@mui/x-charts/BarChart';
 import { getTopArtists } from '../api/roon';
 
 export default function TopArtists({ dateParams }) {
@@ -35,28 +35,45 @@ export default function TopArtists({ dateParams }) {
     );
   }
 
-  // Transform data for chart
-  const chartData = data.map((a) => ({
-    name: a.artist,
-    plays: a.play_count,
-    hours: Math.round(a.total_secs / 3600 * 10) / 10,
-  }));
+  // Prepare data for MUI chart
+  const artistNames = data.map((a) => a.artist);
+  const playTimes = data.map((a) => Math.round(a.total_secs / 60)); // Convert to minutes
 
   return (
     <div className="card top-artists-card">
       <h3>Top Artists</h3>
-      <div className="chart-container">
-        <ResponsiveContainer width="100%" height={600}>
-          <BarChart data={chartData} layout="vertical" margin={{ left: 10 }}>
-            <XAxis type="number" tick={{ fontSize: 11, fill: '#999' }} />
-            <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 12, fill: '#ccc' }} />
-            <Tooltip
-              contentStyle={{ background: '#1e1e2e', border: '1px solid #333', borderRadius: 8 }}
-              formatter={(val, name) => [val, name === 'plays' ? 'Plays' : 'Hours']}
-            />
-            <Bar dataKey="plays" fill="#e17055" radius={[0, 4, 4, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="chart-container" style={{ width: '100%', overflowX: 'auto' }}>
+        <BarChart
+          xAxis={[{
+            scaleType: 'band',
+            data: artistNames,
+            tickLabelStyle: {
+              angle: -45,
+              textAnchor: 'end',
+              fontSize: 11,
+              fill: '#ccc'
+            }
+          }]}
+          series={[{
+            data: playTimes,
+            label: 'Minutes',
+            color: '#e17055'
+          }]}
+          height={500}
+          margin={{ bottom: 120, left: 50, right: 10, top: 20 }}
+          sx={{
+            '& .MuiChartsAxis-tickLabel': {
+              fill: '#999',
+              fontSize: '11px'
+            },
+            '& .MuiChartsAxis-line': {
+              stroke: '#333'
+            },
+            '& .MuiChartsAxis-tick': {
+              stroke: '#333'
+            }
+          }}
+        />
       </div>
       <div className="ranked-list">
         {data.map((a, i) => (
