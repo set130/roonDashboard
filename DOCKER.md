@@ -12,7 +12,7 @@ Deploy Roon Dashboard using Docker for maximum portability.
 
 ### 1. Copy project to your server
 ```bash
-scp -r . user@your-server:/opt/roon-dashboard/
+scp -r . user@your-server:/opt/roonDashboard/
 ```
 
 ### 2. Configure environment (optional)
@@ -20,7 +20,7 @@ scp -r . user@your-server:/opt/roon-dashboard/
 Edit `.env` file if needed:
 ```bash
 ssh user@your-server
-cd /opt/roon-dashboard
+cd /opt/roonDashboard
 cp .env.example .env
 nano .env  # Update ROON_CORE_IP if needed
 ```

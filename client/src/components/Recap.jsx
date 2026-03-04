@@ -32,7 +32,35 @@ export default function Recap({ dateParams }) {
     );
   }
 
-  // ...existing code...
+  const prev = () => {
+    if (slide > 0) {
+      setAnimating(true);
+      setTimeout(() => {
+        setSlide(slide - 1);
+        setAnimating(false);
+      }, 300);
+    }
+  };
+
+  const next = () => {
+    if (slide < RECAP_SLIDES.length - 1) {
+      setAnimating(true);
+      setTimeout(() => {
+        setSlide(slide + 1);
+        setAnimating(false);
+      }, 300);
+    }
+  };
+
+  const goTo = (index) => {
+    if (index !== slide) {
+      setAnimating(true);
+      setTimeout(() => {
+        setSlide(index);
+        setAnimating(false);
+      }, 300);
+    }
+  };
 
   const renderSlide = () => {
     switch (RECAP_SLIDES[slide]) {

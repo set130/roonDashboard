@@ -93,7 +93,7 @@ Serves:
 
 ## 🗄️ Database
 
-**Location:** `/opt/roon-dashboard/roon-dashboard.sqlite`
+**Location:** `/opt/roonDashboard/roon-dashboard.sqlite`
 
 - Auto-created on first run
 - SQLite3 format (self-contained)
@@ -102,7 +102,7 @@ Serves:
 
 Reset database:
 ```bash
-rm roon-dashboard.sqlite*
+rm /opt/roonDashboard/roon-dashboard.sqlite*
 sudo systemctl restart roon-dashboard
 ```
 
@@ -198,7 +198,7 @@ This is normal! Statistics accumulate from the moment the extension starts. Play
 ### Database reset needed
 
 ```bash
-rm /opt/roon-dashboard/roon-dashboard.sqlite*
+rm /opt/roonDashboard/roon-dashboard.sqlite*
 sudo systemctl restart roon-dashboard
 ```
 
@@ -244,7 +244,7 @@ sudo systemctl restart roon-dashboard
 
 ## 🚢 Production Checklist
 
-- [ ] Copy project files to `/opt/roon-dashboard`
+- [ ] Copy project files to `/opt/roonDashboard`
 - [ ] Install dependencies: `npm install`
 - [ ] Build client: `cd client && npm run build`
 - [ ] Create `.env` with correct `ROON_CORE_IP`

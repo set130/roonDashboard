@@ -4,10 +4,10 @@
 
 ```bash
 # 1. Copy to server
-scp -r . user@server:/opt/roon-dashboard/
+scp -r . user@server:/opt/roonDashboard/
 
 # 2. Start
-ssh user@server && cd /opt/roon-dashboard && docker-compose up -d
+ssh user@server && cd /opt/roonDashboard && docker-compose up -d
 
 # 3. Access
 http://your-server-ip/
@@ -122,7 +122,7 @@ GET /api/image/[image_key]
 ## 📁 Key Locations
 
 ```
-/opt/roon-dashboard/              # App root
+/opt/roonDashboard/              # App root
   ├── roon-dashboard.sqlite       # Database
   ├── server/                     # Backend
   ├── client/dist/                # Frontend (built)

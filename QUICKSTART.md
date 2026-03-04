@@ -16,13 +16,13 @@ curl https://raw.githubusercontent.com/youruser/roon-dashboard/main/deploy-setup
 ### Step 2: Copy your project files
 ```bash
 # From your laptop, in the roonDashboard directory
-scp -r . user@your-server-ip:/opt/roon-dashboard/
+scp -r . user@your-server-ip:/opt/roonDashboard/
 ```
 
 ### Step 3: Install dependencies on the server
 ```bash
 ssh user@your-server-ip
-cd /opt/roon-dashboard
+cd /opt/roonDashboard
 
 # Install backend dependencies
 npm install
@@ -133,7 +133,7 @@ sudo systemctl restart nginx
 ## Updating the Dashboard
 
 ```bash
-cd /opt/roon-dashboard
+cd /opt/roonDashboard
 
 # Pull latest changes
 git pull  # Or manually update files
@@ -167,7 +167,7 @@ sudo certbot --nginx -d your-domain.com
 
 - **Frontend served by:** nginx (port 80)
 - **Backend running on:** localhost:3001 (proxied through nginx)
-- **Database location:** /opt/roon-dashboard/roon-dashboard.sqlite
+- **Database location:** /opt/roonDashboard/roon-dashboard.sqlite
 - **Logs:** `sudo journalctl -u roon-dashboard -f`
 - **Config:** /etc/systemd/system/roon-dashboard.service
 

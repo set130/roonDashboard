@@ -6,16 +6,16 @@ Welcome! Your Roon Dashboard is **completely built and ready to deploy**.
 
 ### 🚀 Fastest: Docker
 ```bash
-scp -r . user@server:/opt/roon-dashboard/
-ssh user@server && cd /opt/roon-dashboard
+scp -r . user@server:/opt/roonDashboard/
+ssh user@server && cd /opt/roonDashboard
 docker-compose up -d
 # Access: http://your-server-ip
 ```
 
 ### ⚙️ Traditional: Linux + nginx
 ```bash
-scp -r . user@server:/opt/roon-dashboard/
-ssh user@server && cd /opt/roon-dashboard
+scp -r . user@server:/opt/roonDashboard/
+ssh user@server && cd /opt/roonDashboard
 npm install && cd client && npm run build && cd ..
 sudo systemctl start roon-dashboard
 # Access: http://your-server-ip
@@ -169,9 +169,9 @@ nano .env
 
 - **Monitor logs:** `sudo journalctl -u roon-dashboard -f`
 - **Check status:** `sudo systemctl status roon-dashboard`
-- **Database location:** `/opt/roon-dashboard/roon-dashboard.sqlite`
+- **Database location:** `/opt/roonDashboard/roon-dashboard.sqlite`
 - **Reset database:** `rm roon-dashboard.sqlite* && sudo systemctl restart roon-dashboard`
-- **Check disk:** `df -h /opt/roon-dashboard`
+- **Check disk:** `df -h /opt/roonDashboard`
 
 ---
 

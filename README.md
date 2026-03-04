@@ -108,11 +108,11 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for full deployment guide.
 curl https://raw.githubusercontent.com/youruser/roon-dashboard/main/deploy-setup.sh | sudo bash
 
 # 2. Copy your project files
-scp -r . user@your-server-ip:/opt/roon-dashboard/
+scp -r . user@your-server-ip:/opt/roonDashboard/
 
 # 3. Install and build
 ssh user@your-server-ip
-cd /opt/roon-dashboard
+cd /opt/roonDashboard
 npm install
 cd client && npm run build && cd ..
 
@@ -175,7 +175,7 @@ curl http://localhost:3001/api/stats/playtime?from=2026-01-01T00:00:00Z&to=2026-
 
 The dashboard uses **SQLite** for local, self-contained storage.
 
-**Location:** `/opt/roon-dashboard/roon-dashboard.sqlite` (production) or `./roon-dashboard.sqlite` (local)
+**Location:** `/opt/roonDashboard/roon-dashboard.sqlite` (production) or `./roon-dashboard.sqlite` (local)
 
 **Schema:**
 - `plays` table — Tracks play history with timestamps, artists, albums, durations

@@ -2,7 +2,7 @@
 
 ## Step 1: Create Directory on Server
 ```bash
-ssh set@100.90.5.35 "mkdir -p /opt/roon-dashboard"
+ssh set@100.90.5.35 "mkdir -p /opt/roonDashboard"
 ```
 
 ## Step 2: Deploy Files (from your laptop)
@@ -14,13 +14,13 @@ scp -r \
   --exclude=node_modules \
   --exclude=.git \
   --exclude="roon-dashboard.sqlite*" \
-  . set@100.90.5.35:/opt/roon-dashboard/
+  . set@100.90.5.35:/opt/roonDashboard/
 ```
 
 ## Step 3: Install Dependencies on Server
 ```bash
 ssh set@100.90.5.35 << 'EOF'
-cd /opt/roon-dashboard
+cd /opt/roonDashboard
 
 # Install root dependencies
 npm install
@@ -38,7 +38,7 @@ EOF
 ## Step 4: Set Up Systemd Service
 ```bash
 ssh set@100.90.5.35 << 'EOF'
-sudo cp /opt/roon-dashboard/roon-dashboard.service /etc/systemd/system/
+sudo cp /opt/roonDashboard/roon-dashboard.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable roon-dashboard
 sudo systemctl start roon-dashboard
@@ -79,6 +79,6 @@ ssh set@100.90.5.35 "sudo journalctl -u roon-dashboard -e"
 
 ### Permission denied
 ```bash
-ssh set@100.90.5.35 "sudo chown -R set:set /opt/roon-dashboard"
+ssh set@100.90.5.35 "sudo chown -R set:set /opt/roonDashboard"
 ```
 

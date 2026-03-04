@@ -24,9 +24,9 @@ node --version  # Verify installation
 
 ### 1.3 Create a directory for the app
 ```bash
-sudo mkdir -p /opt/roon-dashboard
-sudo chown $USER:$USER /opt/roon-dashboard
-cd /opt/roon-dashboard
+sudo mkdir -p /opt/roonDashboard
+sudo chown $USER:$USER /opt/roonDashboard
+cd /opt/roonDashboard
 ```
 
 ## Step 2: Copy Project Files
@@ -34,18 +34,18 @@ cd /opt/roon-dashboard
 ### 2.1 From your laptop, copy the project to the server
 ```bash
 # From your laptop's roonDashboard directory:
-scp -r . user@your-server-ip:/opt/roon-dashboard/
+scp -r . user@your-server-ip:/opt/roonDashboard/
 ```
 
 Or use git to clone:
 ```bash
-cd /opt/roon-dashboard
+cd /opt/roonDashboard
 git clone <your-repo-url> .
 ```
 
 ### 2.2 Install dependencies
 ```bash
-cd /opt/roon-dashboard
+cd /opt/roonDashboard
 npm install
 
 # Build the client
@@ -91,7 +91,7 @@ After=network.target
 [Service]
 Type=simple
 User=your-username
-WorkingDirectory=/opt/roon-dashboard
+WorkingDirectory=/opt/roonDashboard
 ExecStart=/usr/bin/node server/index.js
 Restart=always
 RestartSec=10
@@ -140,7 +140,7 @@ server {
 
     # Serve static frontend files
     location / {
-        root /opt/roon-dashboard/client/dist;
+        root /opt/roonDashboard/client/dist;
         try_files $uri $uri/ /index.html;
     }
 
@@ -172,7 +172,7 @@ sudo systemctl restart nginx
 sudo npm install -g pm2
 
 # Start the frontend dev server
-cd /opt/roon-dashboard/client
+cd /opt/roonDashboard/client
 pm2 start "npm run dev" --name "roon-frontend"
 
 # Make it start on boot

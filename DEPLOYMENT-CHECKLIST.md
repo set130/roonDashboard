@@ -38,7 +38,7 @@ curl https://raw.github.../deploy-setup.sh | sudo bash
 ### Step 1: Copy Files
 
 ```bash
-scp -r . user@server-ip:/opt/roon-dashboard/
+scp -r . user@server-ip:/opt/roonDashboard/
 ```
 
 - [ ] All files copied successfully
@@ -47,7 +47,8 @@ scp -r . user@server-ip:/opt/roon-dashboard/
 
 ```bash
 ssh user@server-ip
-cd /opt/roon-dashboard
+cd /opt/roonDashboard
+npm install
 npm install
 cd client && npm install && npm run build && cd ..
 ```
@@ -155,7 +156,7 @@ http://your-server-ip/
 ### Check Database
 
 ```bash
-ls -lh /opt/roon-dashboard/roon-dashboard.sqlite*
+ls -lh /opt/roonDashboard/roon-dashboard.sqlite*
 ```
 
 - [ ] `.sqlite` file exists and grows over time
@@ -176,7 +177,7 @@ sudo journalctl -u roon-dashboard -f
 ### Disk Space
 
 ```bash
-df -h /opt/roon-dashboard
+df -h /opt/roonDashboard
 ```
 
 - [ ] At least 10GB free (database can grow)

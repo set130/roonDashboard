@@ -466,8 +466,8 @@ body {
 .chart-container { margin-bottom: 10px; }
 
 .ranked-list {
-  max-height: 300px;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
 }
 
 .ranked-item {
