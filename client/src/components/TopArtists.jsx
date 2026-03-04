@@ -78,7 +78,14 @@ export default function TopArtists({ dateParams }) {
             '& .MuiChartsAxis-tick': {
               stroke: '#666'
             },
-            '& .MuiChartsLegend-series text': {
+            '& .MuiChartsLegend-root': {
+              '& .MuiChartsLegend-series': {
+                '& text': {
+                  fill: '#ffffff !important'
+                }
+              }
+            },
+            '& .MuiChartsLegend-label': {
               fill: '#ffffff !important'
             }
           }}
