@@ -3,17 +3,11 @@ import { getHistory, imageUrl } from '../api/roon';
 
 export default function History({ dateParams }) {
   const [data, setData] = useState({ rows: [], total: 0, page: 1, limit: 50 });
-  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    setPage(1);
+    getHistory({ ...dateParams, page: 1, limit: 50 }).then(setData).catch(console.error);
   }, [dateParams.range, dateParams.from, dateParams.to]);
 
-  useEffect(() => {
-    getHistory({ ...dateParams, page, limit: 50 }).then(setData).catch(console.error);
-  }, [dateParams.range, dateParams.from, dateParams.to, page]);
-
-  const totalPages = Math.ceil(data.total / data.limit) || 1;
 
   return (
     <div className="card history-card">
@@ -50,11 +44,6 @@ export default function History({ dateParams }) {
                 <span className="h-col h-zone">{row.zone_name}</span>
               </div>
             ))}
-          </div>
-          <div className="pagination">
-            <button disabled={page <= 1} onClick={() => setPage(page - 1)}>← Prev</button>
-            <span>Page {page} of {totalPages}</span>
-            <button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Next →</button>
           </div>
         </>
       )}

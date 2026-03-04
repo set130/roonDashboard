@@ -50,8 +50,14 @@ export default function TopTracks({ dateParams }) {
             tickLabelStyle: {
               angle: -45,
               textAnchor: 'end',
-              fontSize: 11,
-              fill: '#ccc'
+              fontSize: 12,
+              fill: '#ffffff'
+            }
+          }]}
+          yAxis={[{
+            tickLabelStyle: {
+              fontSize: 12,
+              fill: '#ffffff'
             }
           }]}
           series={[{
@@ -63,14 +69,17 @@ export default function TopTracks({ dateParams }) {
           margin={{ bottom: 100, left: 50, right: 10, top: 20 }}
           sx={{
             '& .MuiChartsAxis-tickLabel': {
-              fill: '#999',
-              fontSize: '11px'
+              fill: '#ffffff',
+              fontSize: '12px'
             },
             '& .MuiChartsAxis-line': {
-              stroke: '#333'
+              stroke: '#666'
             },
             '& .MuiChartsAxis-tick': {
-              stroke: '#333'
+              stroke: '#666'
+            },
+            '& .MuiChartsLegend-series text': {
+              fill: '#ffffff !important'
             }
           }}
         />
