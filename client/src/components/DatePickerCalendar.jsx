@@ -32,25 +32,55 @@ export default function DatePickerCalendar({value, onChange, isOpen, onOpenChang
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isOpen, onOpenChange]);
 
-    // Handle scroll for year navigation
+    // Handle scroll for month and year navigation
     useEffect(() => {
         if (!isOpen || !calendarPopupRef.current) return;
 
         const handleWheel = (e) => {
+            // Check if the target is the month or year select
+            const isMonthSelect = e.target.classList.contains('month-select');
+            const isYearSelect = e.target.classList.contains('year-select');
+
+            // Don't prevent default if scrolling within a select dropdown that's open
+            if ((isMonthSelect || isYearSelect) && e.target === document.activeElement) {
+                return; // Let the browser handle dropdown scrolling
+            }
+
             e.preventDefault();
-            if (e.deltaY > 0) {
-                // Scroll down - go to next year
-                setDisplayYear(prev => prev + 1);
-            } else {
-                // Scroll up - go to previous year
-                setDisplayYear(prev => prev - 1);
+
+            if (isMonthSelect) {
+                // Scrolling over month selector - change month
+                if (e.deltaY > 0) {
+                    // Scroll down - next month
+                    if (displayMonth === 11) {
+                        setDisplayMonth(0);
+                        setDisplayYear(displayYear + 1);
+                    } else {
+                        setDisplayMonth(displayMonth + 1);
+                    }
+                } else {
+                    // Scroll up - previous month
+                    if (displayMonth === 0) {
+                        setDisplayMonth(11);
+                        setDisplayYear(displayYear - 1);
+                    } else {
+                        setDisplayMonth(displayMonth - 1);
+                    }
+                }
+            } else if (isYearSelect || !isMonthSelect) {
+                // Scrolling over year selector or anywhere else - change year
+                if (e.deltaY > 0) {
+                    setDisplayYear(prev => prev + 1);
+                } else {
+                    setDisplayYear(prev => prev - 1);
+                }
             }
         };
 
         const popup = calendarPopupRef.current;
         popup.addEventListener('wheel', handleWheel, { passive: false });
         return () => popup.removeEventListener('wheel', handleWheel);
-    }, [isOpen]);
+    }, [isOpen, displayMonth, displayYear]);
 
     const handleDateClick = (day) => {
         const dateStr = `${displayYear}-${String(displayMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
