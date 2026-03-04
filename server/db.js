@@ -46,20 +46,42 @@ function dateFilter(from, to) {
   return { clause: "", params: {} };
 }
 
+// Split composite artist strings ("A / B" -> ["A", "B"]) for classical music.
+// Each artist gets credit for the full play without double-counting in totals.
+function splitArtists(artistString) {
+  if (!artistString || typeof artistString !== 'string') return [artistString];
+  return artistString.split(' / ').map(a => a.trim()).filter(a => a);
+}
+
 // ---------- Top Artists ----------
 function getTopArtists(from, to, limit = 50) {
   const { clause, params } = dateFilter(from, to);
-  const stmt = db.prepare(`
-    SELECT artist,
-           COUNT(*) as play_count,
-           SUM(played_secs) as total_secs
+
+  // Get all plays and expand artists
+  const playsStmt = db.prepare(`
+    SELECT artist, played_secs
     FROM plays
     WHERE 1=1 ${clause}
-    GROUP BY artist
-    ORDER BY play_count DESC
-    LIMIT @limit
   `);
-  return stmt.all({ ...params, limit });
+  const plays = playsStmt.all(params);
+
+  // Count plays and time per artist (splitting composite credits)
+  const artistStats = {};
+  for (const play of plays) {
+    const artists = splitArtists(play.artist);
+    for (const artist of artists) {
+      if (!artistStats[artist]) {
+        artistStats[artist] = { artist, play_count: 0, total_secs: 0 };
+      }
+      artistStats[artist].play_count += 1;
+      artistStats[artist].total_secs += play.played_secs || 0;
+    }
+  }
+
+  // Sort and limit
+  return Object.values(artistStats)
+    .sort((a, b) => b.play_count - a.play_count)
+    .slice(0, limit);
 }
 
 // ---------- Top Tracks ----------
@@ -135,13 +157,28 @@ function getRecap(from, to) {
   `);
   const totals = totalStmt.get(params);
 
-  // Top artist
-  const topArtistStmt = db.prepare(`
+  // Top artist (expand composite artists in-memory)
+  const artistPlaysStmt = db.prepare(`
     SELECT artist, COUNT(*) as play_count, SUM(played_secs) as total_secs
     FROM plays WHERE 1=1 ${clause}
-    GROUP BY artist ORDER BY play_count DESC LIMIT 1
+    GROUP BY artist
   `);
-  const top_artist = topArtistStmt.get(params) || null;
+  const artistPlays = artistPlaysStmt.all(params);
+
+  const artistStats = {};
+  for (const row of artistPlays) {
+    const artists = splitArtists(row.artist);
+    for (const artist of artists) {
+      if (!artistStats[artist]) {
+        artistStats[artist] = { artist, play_count: 0, total_secs: 0 };
+      }
+      artistStats[artist].play_count += row.play_count;
+      artistStats[artist].total_secs += row.total_secs || 0;
+    }
+  }
+
+  const topArtists = Object.values(artistStats).sort((a, b) => b.play_count - a.play_count);
+  const top_artist = topArtists[0] || null;
 
   // Top track
   const topTrackStmt = db.prepare(`
@@ -164,11 +201,17 @@ function getRecap(from, to) {
   `);
   const busiest_day = busiestDayStmt.get(params) || null;
 
-  // Unique artists count
-  const uniqueArtistsStmt = db.prepare(`
-    SELECT COUNT(DISTINCT artist) as count FROM plays WHERE 1=1 ${clause}
+  // Unique artists count (expand splits)
+  const allArtistsStmt = db.prepare(`
+    SELECT DISTINCT artist FROM plays WHERE 1=1 ${clause}
   `);
-  const unique_artists = uniqueArtistsStmt.get(params).count;
+  const allArtists = allArtistsStmt.all(params);
+  const uniqueArtistSet = new Set();
+  for (const row of allArtists) {
+    const artists = splitArtists(row.artist);
+    artists.forEach(a => uniqueArtistSet.add(a));
+  }
+  const unique_artists = uniqueArtistSet.size;
 
   // Unique tracks count
   const uniqueTracksStmt = db.prepare(`
