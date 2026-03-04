@@ -813,3 +813,18 @@ body {
   }
   .h-album, .h-zone, .h-date { display: none; }
 }
+
+/* MUI Charts Legend - Force White Text */
+.MuiChartsLegend-root text,
+.MuiChartsLegend-label,
+.MuiChartsLegend-series text,
+.MuiChartsLegend-mark + text {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Ensure all chart text is white */
+.MuiChartsAxis-tickLabel {
+  fill: #ffffff !important;
+}
+
