@@ -8,7 +8,7 @@ export default function TopTracks({ dateParams }) {
 
   useEffect(() => {
     setLoading(true);
-    getTopTracks({ ...dateParams, limit: 20 })
+    getTopTracks({ ...dateParams, limit: 10 })
       .then(setData)
       .catch((err) => {
         console.error('Failed to fetch top tracks:', err);
