@@ -9,12 +9,13 @@ import './App.css';
 
 export default function App() {
   const [dateParams, setDateParams] = useState({ range: 'all', from: null, to: null });
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <ErrorBoundary>
       <BrowserRouter>
         <div className="app">
-          <aside className="sidebar">
+          <aside className={`sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
             <div className="sidebar-brand">
               <h1>Roon Dashboard</h1>
             </div>
@@ -24,8 +25,19 @@ export default function App() {
               <NavLink to="/recap">Recap</NavLink>
             </nav>
           </aside>
-          <main className="main">
+          <main className={`main ${sidebarOpen ? '' : 'expanded'}`}>
             <header className="topbar">
+              <button
+                className="sidebar-toggle"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+              >
+                <span className="hamburger-icon">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </span>
+              </button>
               <DateRangePicker value={dateParams} onChange={setDateParams} />
             </header>
             <div className="content">
