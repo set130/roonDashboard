@@ -4,12 +4,29 @@ import { getTopArtists } from '../api/roon';
 
 export default function TopArtists({ dateParams }) {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getTopArtists({ ...dateParams, limit: 20 }).then(setData).catch(console.error);
-  }, [dateParams.range, dateParams.from, dateParams.to]);
+    setLoading(true);
+    getTopArtists({ ...dateParams, limit: 20 })
+      .then(setData)
+      .catch((err) => {
+        console.error('Failed to fetch top artists:', err);
+        setData([]);
+      })
+      .finally(() => setLoading(false));
+  }, [dateParams?.range, dateParams?.from, dateParams?.to]);
 
-  if (data.length === 0) {
+  if (loading) {
+    return (
+      <div className="card">
+        <h3>Top Artists</h3>
+        <p className="empty-state">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
     return (
       <div className="card">
         <h3>Top Artists</h3>
@@ -18,7 +35,12 @@ export default function TopArtists({ dateParams }) {
     );
   }
 
-  // ...existing code...
+  // Transform data for chart
+  const chartData = data.map((a) => ({
+    name: a.artist,
+    plays: a.play_count,
+    hours: Math.round(a.total_secs / 3600 * 10) / 10,
+  }));
 
   return (
     <div className="card top-artists-card">

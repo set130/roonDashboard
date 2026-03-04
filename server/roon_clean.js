@@ -7,7 +7,6 @@ const { handleZonesChanged, handleZonesRemoved } = require("./tracker");
 // Configuration from environment variables
 const ROON_CORE_IP = process.env.ROON_CORE_IP || "100.90.5.35";
 const ROON_CORE_PORT = parseInt(process.env.ROON_CORE_PORT || "9100", 10);
-const ROON_LOG_LEVEL = process.env.ROON_LOG_LEVEL || "none";
 
 let _core = null;
 let _transport = null;
@@ -20,10 +19,6 @@ const roon = new RoonApi({
   publisher: "Roon Dashboard",
   email: "dashboard@local",
   website: "",
-  log_level: ROON_LOG_LEVEL,
-  moo_onerror: function () {
-    console.error("[Roon] Transport error while talking to core (moo_onerror)");
-  },
 
   core_paired: function (core) {
     console.log("[Roon] Core paired:", core.display_name);
@@ -60,44 +55,10 @@ roon.init_services({
   provided_services: [svcStatus],
 });
 
-// node-roon-api is not guaranteed to be an EventEmitter in all versions.
-if (typeof roon.on === "function") {
-  roon.on("error", (err) => {
-    console.error("[Roon] RoonApi Error:", err);
-  });
-} else {
-  console.warn("[Roon] RoonApi error events are not supported by this library version.");
-}
-
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("[Roon] Unhandled Rejection at:", promise, "reason:", reason);
-});
-
-process.on("uncaughtException", (error) => {
-  console.error("[Roon] Uncaught Exception:", error);
-});
-
-// Connect to Roon Core.
-// By default use discovery because Core HTTP port is not guaranteed to be 9100.
+// Connect to the Roon Core at the specified IP
 function startRoon() {
-  const directConnect = process.env.ROON_DIRECT_CONNECT === "true";
-
-  if (directConnect) {
-    console.log(`[Roon] Direct mode - IP: ${ROON_CORE_IP}, Port: ${ROON_CORE_PORT}`);
-    try {
-      roon.ws_connect({ host: ROON_CORE_IP, port: ROON_CORE_PORT });
-    } catch (error) {
-      console.error("[Roon] Direct connection error:", error);
-    }
-    return;
-  }
-
-  console.log("[Roon] Discovery mode - searching for Roon Core on local network...");
-  try {
-    roon.start_discovery();
-  } catch (error) {
-    console.error("[Roon] Discovery start error:", error);
-  }
+  console.log(`[Roon] Connecting to core at ${ROON_CORE_IP}:${ROON_CORE_PORT}...`);
+  roon.ws_connect({ host: ROON_CORE_IP, port: ROON_CORE_PORT });
 }
 
 function getImage(image_key, opts, cb) {

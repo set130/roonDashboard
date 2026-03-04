@@ -26,7 +26,11 @@ function commitPlay(zoneState) {
   if (!zoneState || !zoneState.track) return;
   var now = new Date();
   var playedSecs = Math.round((now - zoneState.startedAt) / 1000);
-  if (playedSecs < MIN_PLAY_SECS) return;
+  console.log("[Tracker] Attempting to commit play: " + zoneState.track.track_title + " - played " + playedSecs + "s (min: " + MIN_PLAY_SECS + "s)");
+  if (playedSecs < MIN_PLAY_SECS) {
+    console.log("[Tracker] Skipping - too short");
+    return;
+  }
   var play = {
     zone_id: zoneState.zone_id,
     zone_name: zoneState.zone_name,
@@ -41,7 +45,7 @@ function commitPlay(zoneState) {
   };
   try {
     insertPlay(play);
-    console.log("[Tracker] Logged: " + play.track_title + " by " + play.artist + " (" + play.played_secs + "s)");
+    console.log("[Tracker] ✓ Logged: " + play.track_title + " by " + play.artist + " (" + play.played_secs + "s)");
   } catch (err) {
     console.error("[Tracker] Failed to insert play:", err);
   }
@@ -53,13 +57,16 @@ function handleZonesChanged(zones) {
     var zone = zones[i];
     var key = trackKey(zone.now_playing);
     var prevState = zoneStates[zone.zone_id];
-    if (zone.state === "stopped" || !zone.now_playing) {
+
+    // Handle stopped, paused, or no content - commit and clean up
+    if (zone.state === "stopped" || zone.state === "paused" || !zone.now_playing) {
       if (prevState && prevState.track) {
         commitPlay(prevState);
         delete zoneStates[zone.zone_id];
       }
       continue;
     }
+
     var prevKey = null;
     if (prevState && prevState.track) {
       prevKey = prevState.track.track_title + "|||" + prevState.track.artist + "|||" + prevState.track.album;
@@ -73,10 +80,12 @@ function handleZonesChanged(zones) {
         track: trackInfo,
         startedAt: new Date(),
         state: zone.state,
+        seek_position: zone.now_playing.seek_position,
       };
       console.log("[Tracker] Now playing: " + trackInfo.track_title + " by " + trackInfo.artist + " in " + zone.display_name);
     } else if (prevState) {
       prevState.state = zone.state;
+      prevState.seek_position = zone.now_playing.seek_position;
     }
   }
 }
@@ -98,7 +107,16 @@ function getNowPlaying() {
   for (var i = 0; i < keys.length; i++) {
     var zoneId = keys[i];
     var state = zoneStates[zoneId];
-    if (state.track) {
+    // Only include zones that are actively playing
+    if (state.track && state.state === "playing") {
+      // Calculate elapsed time from startedAt
+      var calculatedElapsed = Math.round((Date.now() - state.startedAt.getTime()) / 1000);
+
+      // Use seek_position if it seems reliable (not 0 and defined), otherwise use calculated
+      var elapsedSecs = (state.seek_position !== undefined && state.seek_position > 0)
+        ? state.seek_position
+        : calculatedElapsed;
+
       result.push({
         zone_id: zoneId,
         zone_name: state.zone_name,
@@ -106,7 +124,7 @@ function getNowPlaying() {
         artist: state.track.artist,
         album: state.track.album,
         duration_secs: state.track.duration_secs,
-        elapsed_secs: Math.round((Date.now() - state.startedAt.getTime()) / 1000),
+        elapsed_secs: elapsedSecs,
         image_key: state.track.image_key,
         state: state.state,
       });

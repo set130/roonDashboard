@@ -57,6 +57,16 @@ app.listen(PORT, () => {
   startRoon();
 });
 
+// Global error handlers
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("[Server] Unhandled Rejection:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("[Server] Uncaught Exception:", err);
+  process.exit(1);
+});
+
 // Graceful shutdown
 process.on("SIGINT", () => {
   console.log("\n[Server] Shutting down...");

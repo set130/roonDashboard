@@ -4,12 +4,29 @@ import { getTopTracks, imageUrl } from '../api/roon';
 
 export default function TopTracks({ dateParams }) {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getTopTracks({ ...dateParams, limit: 20 }).then(setData).catch(console.error);
-  }, [dateParams.range, dateParams.from, dateParams.to]);
+    setLoading(true);
+    getTopTracks({ ...dateParams, limit: 20 })
+      .then(setData)
+      .catch((err) => {
+        console.error('Failed to fetch top tracks:', err);
+        setData([]);
+      })
+      .finally(() => setLoading(false));
+  }, [dateParams?.range, dateParams?.from, dateParams?.to]);
 
-  if (data.length === 0) {
+  if (loading) {
+    return (
+      <div className="card">
+        <h3>Top Tracks</h3>
+        <p className="empty-state">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
     return (
       <div className="card">
         <h3>Top Tracks</h3>
@@ -18,7 +35,11 @@ export default function TopTracks({ dateParams }) {
     );
   }
 
-  // ...existing code...
+  // Transform data for chart
+  const chartData = data.map((t) => ({
+    name: `${t.track_title} - ${t.artist}`,
+    plays: t.play_count,
+  }));
 
   return (
     <div className="card top-tracks-card">
