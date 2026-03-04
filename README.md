@@ -130,6 +130,28 @@ See [QUICKSTART.md](./QUICKSTART.md) for more details.
 
 ---
 
+## Updating Your Server
+
+After pushing changes to GitHub, update your production server:
+
+```bash
+cd /opt/roonDashboard
+sudo bash update.sh
+```
+
+The update script will:
+- ✅ Pull latest changes from GitHub
+- ✅ Backup your database (all play history is preserved)
+- ✅ Update dependencies if needed
+- ✅ Rebuild the client
+- ✅ Restart the service
+
+**Your database is safe!** SQLite files are not tracked in git, so `git pull` will never overwrite your play history.
+
+See [SERVER-UPDATE-GUIDE.md](./SERVER-UPDATE-GUIDE.md) for detailed update instructions.
+
+---
+
 ## API Reference
 
 ### Endpoints

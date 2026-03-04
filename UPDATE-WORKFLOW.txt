@@ -1,0 +1,78 @@
+╔════════════════════════════════════════════════════════════════╗
+║              ROON DASHBOARD - UPDATE WORKFLOW                  ║
+╚════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────────┐
+│ ON YOUR WINDOWS MACHINE (Development)                          │
+└────────────────────────────────────────────────────────────────┘
+
+1. Make your changes to the code
+
+2. Test locally (optional):
+   npm run dev
+
+3. Commit and push to GitHub:
+   git add .
+   git commit -m "Description of changes"
+   git push origin main
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ ON YOUR UBUNTU SERVER (Production)                             │
+└────────────────────────────────────────────────────────────────┘
+
+4. SSH into your server:
+   ssh set@YOUR_SERVER_IP
+
+5. Run the update script:
+   cd /opt/roonDashboard
+   sudo bash update.sh
+
+   ✓ Done! Your changes are live.
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ IMPORTANT: YOUR DATABASE IS SAFE                               │
+└────────────────────────────────────────────────────────────────┘
+
+✓ Database files are NOT tracked in git
+✓ git pull will NEVER overwrite your database
+✓ All your play history is preserved
+✓ update.sh creates automatic backups anyway
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ QUICK REFERENCE COMMANDS                                       │
+└────────────────────────────────────────────────────────────────┘
+
+Check service status:
+  sudo systemctl status roon-dashboard
+
+View live logs:
+  sudo journalctl -u roon-dashboard -f
+
+Restart service manually:
+  sudo systemctl restart roon-dashboard
+
+Check if running:
+  curl http://localhost:3001/api/status
+
+
+┌────────────────────────────────────────────────────────────────┐
+│ TROUBLESHOOTING                                                │
+└────────────────────────────────────────────────────────────────┘
+
+Service won't start:
+  sudo journalctl -u roon-dashboard -n 50
+
+Browser showing old version:
+  Hard refresh: Ctrl + Shift + R
+
+Check database:
+  ls -lh /opt/roonDashboard/roon-dashboard.sqlite*
+
+
+╔════════════════════════════════════════════════════════════════╗
+║  For full details: cat SERVER-UPDATE-GUIDE.md                  ║
+╚════════════════════════════════════════════════════════════════╝
+
