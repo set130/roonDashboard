@@ -20,6 +20,9 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: hidden;
 }
 
 .app {
@@ -911,18 +914,21 @@ body {
   }
 
   .topbar {
-    padding: 12px;
+    padding: 11px 12px;
     gap: 10px;
     align-items: center;
+    background: #181818;
+    border-bottom-color: #323232;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
   }
 
   .sidebar-brand h1 {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .sidebar-nav a {
-    padding: 12px 14px;
-    font-size: 16px;
+    padding: 11px 12px;
+    font-size: 15px;
   }
 
   .mobile-topbar-main {
@@ -935,7 +941,7 @@ body {
   }
 
   .mobile-page-title {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
     color: #ececec;
     white-space: nowrap;
@@ -943,47 +949,44 @@ body {
     text-overflow: ellipsis;
   }
 
+  .sidebar-toggle,
+  .mobile-filter-toggle {
+    min-height: 36px;
+  }
+
   .mobile-filter-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    background: #1f1f1f;
-    color: var(--text-muted);
-    font-size: 14px;
+    padding: 7px 11px;
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    background: #232323;
+    color: #dbdbdb;
+    font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
   }
 
   .mobile-filter-toggle.active {
     background: #322718;
-    border-color: #58401f;
+    border-color: #6a4b21;
     color: #f3d6a4;
   }
 
   .mobile-filters-panel {
     display: block;
     padding: 12px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-2);
-  }
-
-  .mobile-filters-panel .date-range-picker {
-    width: 100%;
+    border-bottom: 1px solid #323232;
+    background: #181818;
   }
 
   .mobile-filters-panel .range-btn,
   .mobile-filters-panel .date-picker-button,
   .mobile-filters-panel .nav-btn,
   .mobile-filters-panel .calendar-close {
-    font-size: 14px;
-    min-height: 36px;
-  }
-
-  .mobile-filters-panel .calendar-day {
     font-size: 13px;
+    min-height: 34px;
   }
 
   .sidebar-toggle {
@@ -1012,118 +1015,152 @@ body {
 
   .content {
     padding: 12px;
-    gap: 10px;
+    gap: 12px;
   }
 
-  .card {
+  .app.mobile .card {
     padding: 14px;
+    border-color: #383838;
+    background: linear-gradient(180deg, #232323 0%, #1f1f1f 100%);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
   }
 
-  .card h3 {
-    font-size: 22px;
+  .app.mobile .card h3 {
+    font-size: 19px;
     line-height: 1.25;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+    color: #f1f1f1;
   }
 
   .connection-status {
-    font-size: 15px;
+    font-size: 14px;
+  }
+
+  .now-playing-zone {
+    gap: 12px;
+    padding: 10px 0;
+  }
+
+  .np-artwork img,
+  .np-artwork-placeholder {
+    width: 64px;
+    height: 64px;
   }
 
   .np-track {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.35;
   }
 
   .np-artist,
   .np-album {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.35;
   }
 
   .np-zone-name,
   .np-time {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .playtime-stats {
-    gap: 14px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .stat-big {
+    padding: 10px;
+    border: 1px solid #343434;
+    border-radius: 4px;
+    background: #1d1d1d;
   }
 
   .stat-value {
-    font-size: 30px;
+    font-size: 26px;
+    display: block;
+    line-height: 1.1;
   }
 
   .stat-label {
-    font-size: 12px;
+    font-size: 11px;
+  }
+
+  .chart-container {
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 8px 8px 2px;
+    background: #1d1d1d;
   }
 
   .rank {
-    font-size: 13px;
+    font-size: 12px;
+  }
+
+  .ranked-item {
+    padding: 9px 0;
   }
 
   .ranked-name {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .ranked-sub,
   .ranked-stats {
-    font-size: 13px;
-  }
-
-  .empty-state {
-    font-size: 14px;
-  }
-
-  .history-header {
     font-size: 12px;
   }
 
+  .empty-state {
+    font-size: 13px;
+  }
+
+  .history-header {
+    font-size: 11px;
+  }
+
   .history-row {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .pagination button,
   .pagination span {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .chart-container .MuiChartsAxis-tickLabel {
-    font-size: 13px !important;
+    font-size: 11px !important;
   }
 
   .chart-container .MuiChartsLegend-label,
   .chart-container .MuiChartsLegend-root text {
-    font-size: 13px !important;
+    font-size: 11px !important;
   }
 }
 
 @media (max-width: 480px) {
-  .card h3 {
-    font-size: 24px;
+  .content {
+    padding: 10px;
   }
 
-  .connection-status {
-    font-size: 16px;
+  .app.mobile .card h3 {
+    font-size: 18px;
   }
 
-  .np-track {
-    font-size: 17px;
-  }
-
-  .np-artist,
-  .np-album,
-  .ranked-name {
+  .mobile-page-title {
     font-size: 15px;
   }
 
-  .ranked-sub,
-  .ranked-stats {
-    font-size: 13px;
+  .mobile-filter-toggle {
+    font-size: 12px;
+  }
+
+  .playtime-stats {
+    grid-template-columns: 1fr;
   }
 
   .stat-value {
-    font-size: 32px;
+    font-size: 24px;
   }
 }
 
