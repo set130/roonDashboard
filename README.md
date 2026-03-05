@@ -1,18 +1,19 @@
 # Roon Dashboard
 
-A beautiful, modern music statistics dashboard for Roon — inspired by Spotify Wrapped and Apple Music Rewind. Track your listening habits, view top artists/tracks, see play history, and get personalized listening recaps.
+A Roon music statistics dashboard inspired by Spotify Wrapped and Apple Music Rewind. Track your listening habits, view top artists/tracks, see play history, and get personalized listening recaps.
 
 ## Features
 
-✅ **Real-time Now Playing** — See what's currently playing with album artwork
-✅ **Listening Statistics** — Total hours, daily breakdown charts
-✅ **Top Artists & Tracks** — Ranked lists with play counts and durations
-✅ **Play History** — Paginated history with track details and timestamps
-✅ **Listening Recap** — Wrapped-style statistics (top artist, top track, streaks, variety)
-✅ **Flexible Date Ranges** — Today, This Week, 4 Weeks, This Month, This Year, All Time, or Custom
-✅ **Dark Theme** — Roon-inspired dark gray + amber aesthetic
-✅ **Responsive UI** — Works on desktop and mobile
-✅ **SQLite Database** — Self-contained, no external dependencies
+- **Real-time Now Playing** — See what's currently playing across all zones with album artwork
+- **Listening Statistics** — Total hours, daily breakdown charts, flexible date ranges
+- **Top Artists & Tracks** — Ranked lists with play counts and durations
+- **Top Albums & Zones** — Genre and zone-based listening insights
+- **Play History** — Track history with details and timestamps
+- **Listening Recap** — Wrapped-style statistics summary
+- **Flexible Date Ranges** — Daily, Weekly, 4 Weeks, Monthly, Yearly, All Time, or Custom ranges
+- **Dark Theme** — Roon-inspired dark gray + amber aesthetic
+- **Responsive UI** — Works on desktop and mobile
+- **SQLite Database** — Self-contained, no external dependencies
 
 ## Tech Stack
 
@@ -71,62 +72,85 @@ The dashboard will be available at:
 
 ### Configuration
 
-The backend connects to Roon Core at `100.90.5.35:9100` by default.
+The backend connects to Roon Core via the IP and port you specify.
 
-To change this, set environment variables:
+Create a `.env` file in the project root:
+```bash
+# Backend
+PORT=3001
+NODE_ENV=production
+
+# Roon Core (adjust IP and port to match your setup)
+ROON_CORE_IP=100.90.5.35
+ROON_CORE_PORT=9100
+
+# Database location
+DATABASE_PATH=./roon-dashboard.sqlite
+```
+
+**Or use environment variables:**
 ```bash
 export ROON_CORE_IP=192.168.1.100
 export ROON_CORE_PORT=9100
 export PORT=3001
+export NODE_ENV=production
+npm run dev
 ```
 
-Or create a `.env` file:
-```bash
-cp .env.example .env
-# Edit .env with your settings
-```
+See `.env.example` for all available options.
 
 ### Roon Setup
 
-1. Open **Roon** on any device
-2. Go to **Settings → Extensions**
-3. Find **"Roon Dashboard"** in the pending extensions list
-4. Click **Approve**
+The dashboard is a **standalone server** that communicates with Roon Core via the Roon API.
 
-The dashboard will now track your listening in real-time.
+1. Ensure **Roon Core** is running on your network (e.g., 100.90.5.35:9100)
+2. Start the Roon Dashboard server
+3. The dashboard will automatically connect to Roon Core
+4. The first connection may require approval in Roon's extension settings
+
+**Note:** The dashboard requires network connectivity to your Roon Core. Both the server and Roon Core must be on the same network or have proper routing configured.
 
 ---
 
 ## Production Deployment
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for full deployment guide.
-
-### Quick Deployment (5 minutes)
+### Quick Deployment (on your server)
 
 ```bash
-# 1. On your server, run the setup script (one-time)
-curl https://raw.githubusercontent.com/youruser/roon-dashboard/master/deploy-setup.sh | sudo bash
+# 1. Clone the repository
+cd /opt
+sudo git clone https://github.com/set130/roonDashboard.git
+cd roonDashboard
 
-# 2. Copy your project files
-scp -r . user@your-server-ip:/opt/roonDashboard/
+# 2. Create .env file with your Roon Core IP
+sudo tee .env > /dev/null << 'EOF'
+ROON_CORE_IP=100.90.5.35
+ROON_CORE_PORT=9100
+PORT=3001
+NODE_ENV=production
+DATABASE_PATH=/opt/roonDashboard/roon-dashboard.sqlite
+EOF
 
-# 3. Install and build
-ssh user@your-server-ip
-cd /opt/roonDashboard
+# 3. Install dependencies
 npm install
+cd client && npm install && cd ..
+
+# 4. Build the frontend
 cd client && npm run build && cd ..
 
-# 4. Start the service
+# 5. Set up systemd service
+sudo cp roon-dashboard.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable roon-dashboard
 sudo systemctl start roon-dashboard
-sudo systemctl status roon-dashboard
 
-# 5. Approve in Roon
-# Settings → Extensions → Approve "Roon Dashboard"
+# 6. Check status
+sudo systemctl status roon-dashboard
 ```
 
-**Access at:** `http://your-server-ip/`
+**Access at:** `http://your-server-ip:3001`
 
-See [QUICKSTART.md](./QUICKSTART.md) for more details.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
 
 ---
 
@@ -229,22 +253,26 @@ roonDashboard/
 │
 ├── client/
 │   ├── src/
-│   │   ├── App.jsx           - Main app component
-│   │   ├── App.css           - Dark theme styles
+│   │   ├── App.jsx           - Main app with routing
+│   │   ├── App.css           - Dark theme styles (dark gray + amber)
+│   │   ├── ErrorBoundary.jsx - Error handling
 │   │   ├── api/
-│   │   │   └── roon.js       - API client
+│   │   │   └── client.js     - API client
 │   │   └── components/
-│   │       ├── Dashboard.jsx - Dashboard view
-│   │       ├── History.jsx   - Play history view
-│   │       ├── Recap.jsx     - Recap view
-│   │       ├── NowPlaying.jsx
-│   │       ├── PlayTime.jsx
-│   │       ├── TopArtists.jsx
-│   │       ├── TopTracks.jsx
-│   │       ├── DateRangePicker.jsx
-│   │       └── DatePickerCalendar.jsx
+│   │       ├── Dashboard.jsx     - Main dashboard view
+│   │       ├── History.jsx       - Play history view
+│   │       ├── Recap.jsx         - Statistics recap view
+│   │       ├── NowPlaying.jsx    - Currently playing info
+│   │       ├── PlayTime.jsx      - Time spent listening charts
+│   │       ├── TopArtists.jsx    - Top artists ranking
+│   │       ├── TopTracks.jsx     - Top tracks ranking
+│   │       ├── TopAlbums.jsx     - Top albums ranking
+│   │       ├── TopZones.jsx      - Zone-based statistics
+│   │       ├── DateRangePicker.jsx  - Date range selector
+│   │       └── DatePickerCalendar.jsx - Calendar date picker
 │   ├── index.html
-│   └── vite.config.js
+│   ├── vite.config.js
+│   └── package.json
 │
 ├── DEPLOYMENT.md             - Full deployment guide
 ├── QUICKSTART.md             - Quick start guide
@@ -258,19 +286,31 @@ roonDashboard/
 
 ## Troubleshooting
 
+### Backend won't connect to Roon Core
+
+```bash
+# Check Roon Core is reachable
+ping 100.90.5.35
+
+# Verify ROON_CORE_IP and ROON_CORE_PORT in .env
+cat .env
+
+# Check server logs
+sudo journalctl -u roon-dashboard -f
+```
+
 ### "Disconnected" status
 
-The dashboard shows "Disconnected" until you approve the extension in Roon:
-1. Open Roon
-2. Settings → Extensions
-3. Find "Roon Dashboard"
-4. Click **Approve**
+The dashboard shows "Disconnected" until you:
+1. Start the Roon Dashboard server
+2. Ensure Roon Core is running on the network
+3. Check firewall allows port 9100 (Roon API)
 
-It may take a few seconds to connect after approval.
+It may take a few seconds to connect after startup.
 
 ### Empty statistics
 
-Statistics accumulate from the moment the extension starts tracking. If you just set it up, play some music and wait a few minutes for data to appear.
+Statistics accumulate from the moment the server starts tracking. If you just set it up, play some music and wait a few minutes for data to appear.
 
 ### Backend won't start
 
@@ -280,20 +320,34 @@ lsof -i :3001
 
 # Check logs
 sudo journalctl -u roon-dashboard -f
+tail -f /var/log/syslog
 
-# Verify Roon Core is reachable
-ping 100.90.5.35
+# Verify dependencies are installed
+npm install
 ```
 
-### Frontend returns 502 Bad Gateway
+### Frontend shows "Cannot connect to backend"
 
 ```bash
 # Verify backend is running
 curl http://localhost:3001/api/status
 
-# Check nginx config (if using nginx)
-sudo nginx -t
-sudo systemctl restart nginx
+# Check Vite proxy configuration in client/vite.config.js
+# Ensure it points to the correct backend URL
+```
+
+### Database issues
+
+```bash
+# Check database file exists and has proper permissions
+ls -la roon-dashboard.sqlite*
+
+# Monitor database size
+du -h roon-dashboard.sqlite*
+
+# Reset database (will lose play history)
+rm roon-dashboard.sqlite*
+sudo systemctl restart roon-dashboard
 ```
 
 ---
@@ -339,20 +393,22 @@ du -h roon-dashboard.sqlite*
 
 ## Known Limitations
 
-- ⚠️ Roon Core IP must be reachable from the server
-- ⚠️ Historical play data only accumulates from extension startup (not retroactive)
-- ⚠️ Custom date ranges support unlimited-digit years (e.g., year 23847324983274)
+- Roon Core IP must be reachable from the server (same network or routable)
+- Historical play data only accumulates from server startup (not retroactive)
+- Play history is stored locally in SQLite; backing up the database file is recommended for data preservation
+- Single Roon Core connection (multiple cores not yet supported)
 
 ---
 
 ## Future Enhancements
 
-- 🎯 Multiple Roon Core support
-- 🎯 Statistics export (CSV/PDF)
-- 🎯 Comparative listening (week-over-week, year-over-year)
-- 🎯 Genre/mood statistics
-- 🎯 Listening timeline visualization
-- 🎯 Integration with Roon bookmarks/favorites
+- Multiple Roon Core support
+- Statistics export (CSV/PDF)
+- Comparative listening (week-over-week, year-over-year)
+- Genre/mood statistics
+- Listening timeline visualization
+- Integration with Roon bookmarks/favorites
+- Retroactive play history import
 
 ---
 
@@ -362,14 +418,15 @@ MIT
 
 ---
 
-## Support
+## Support & Documentation
 
-For issues or questions:
-1. Check [DEPLOYMENT.md](./DEPLOYMENT.md) or [QUICKSTART.md](./QUICKSTART.md)
-2. Review the troubleshooting section above
-3. Check server logs: `sudo journalctl -u roon-dashboard -f`
+For detailed information:
+- **Setup & Deployment:** See [DEPLOYMENT.md](./DEPLOYMENT.md)
+- **Quick Start:** See [QUICKSTART.md](./QUICKSTART.md)
+- **Server Updates:** See [SERVER-UPDATE-GUIDE.md](./SERVER-UPDATE-GUIDE.md)
+- **Server Logs:** `sudo journalctl -u roon-dashboard -f`
 
 ---
 
-**Enjoy tracking your music! 🎵**
+**Enjoy tracking your music!**
 
