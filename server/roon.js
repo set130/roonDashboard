@@ -32,12 +32,23 @@ const roon = new RoonApi({
     _image = core.services.RoonApiImage;
 
     _transport.subscribe_zones(function (cmd, data) {
+      console.log("[Roon] Zone subscription event: cmd=" + cmd);
       if (cmd === "Subscribed" && data.zones) {
+        console.log("[Roon] Initial zones: " + data.zones.map(z => z.display_name).join(", "));
         handleZonesChanged(data.zones);
       } else if (cmd === "Changed") {
-        if (data.zones_changed) handleZonesChanged(data.zones_changed);
-        if (data.zones_removed) handleZonesRemoved(data.zones_removed);
-        if (data.zones_added) handleZonesChanged(data.zones_added);
+        if (data.zones_changed) {
+          console.log("[Roon] zones_changed: " + data.zones_changed.map(z => z.display_name).join(", "));
+          handleZonesChanged(data.zones_changed);
+        }
+        if (data.zones_removed) {
+          console.log("[Roon] zones_removed: " + data.zones_removed.join(", "));
+          handleZonesRemoved(data.zones_removed);
+        }
+        if (data.zones_added) {
+          console.log("[Roon] zones_added: " + data.zones_added.map(z => z.display_name).join(", "));
+          handleZonesChanged(data.zones_added);
+        }
       }
     });
 

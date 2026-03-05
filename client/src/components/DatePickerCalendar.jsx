@@ -10,6 +10,7 @@ export default function DatePickerCalendar({value, onChange, isOpen, onOpenChang
         }
         return new Date().getFullYear();
     });
+
     const [displayMonth, setDisplayMonth] = useState(() => {
         if (value) {
             const parts = value.split('-');
@@ -18,7 +19,7 @@ export default function DatePickerCalendar({value, onChange, isOpen, onOpenChang
         return new Date().getMonth();
     });
 
-    // Close picker when clicking outside
+    // Close the picker when clicking outside
     useEffect(() => {
         if (!isOpen) return;
 
@@ -78,7 +79,7 @@ export default function DatePickerCalendar({value, onChange, isOpen, onOpenChang
         };
 
         const popup = calendarPopupRef.current;
-        popup.addEventListener('wheel', handleWheel, { passive: false });
+        popup.addEventListener('wheel', handleWheel, {passive: false});
         return () => popup.removeEventListener('wheel', handleWheel);
     }, [isOpen, displayMonth, displayYear]);
 
