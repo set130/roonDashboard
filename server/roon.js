@@ -1,8 +1,10 @@
 const RoonApi = require("node-roon-api");
 const RoonApiTransport = require("node-roon-api-transport");
+const RoonApiBrowse = require("node-roon-api-browse");
 const RoonApiImage = require("node-roon-api-image");
 const RoonApiStatus = require("node-roon-api-status");
 const { handleZonesChanged, handleZonesRemoved } = require("./tracker");
+const historyPoller = require("./history-poller");
 
 // Configuration from environment variables
 const ROON_CORE_IP = process.env.ROON_CORE_IP || "100.90.5.35";
@@ -52,11 +54,16 @@ const roon = new RoonApi({
       }
     });
 
+    // Initialize history poller for Arc and other plays that might not trigger zone events
+    console.log("[Roon] Initializing history poller for Arc plays...");
+    historyPoller.init(core);
+
     svcStatus.set_status("Connected to " + core.display_name, false);
   },
 
   core_unpaired: function (core) {
     console.log("[Roon] Core unpaired:", core.display_name);
+    historyPoller.stopPolling();
     _core = null;
     _transport = null;
     _image = null;
@@ -67,7 +74,7 @@ const roon = new RoonApi({
 const svcStatus = new RoonApiStatus(roon);
 
 roon.init_services({
-  required_services: [RoonApiTransport, RoonApiImage],
+  required_services: [RoonApiTransport, RoonApiImage, RoonApiBrowse],
   provided_services: [svcStatus],
 });
 
