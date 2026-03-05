@@ -20,6 +20,7 @@ export default function App() {
   const [dateParams, setDateParams] = useState({ range: 'all', from: null, to: null });
   const [isMobile, setIsMobile] = useState(isPhoneViewport);
   const [sidebarOpen, setSidebarOpen] = useState(() => !isPhoneViewport());
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
@@ -46,6 +47,9 @@ export default function App() {
 
   useEffect(() => {
     setSidebarOpen(!isMobile);
+    if (!isMobile) {
+      setMobileFiltersOpen(false);
+    }
   }, [isMobile]);
 
   useEffect(() => {
@@ -65,6 +69,21 @@ export default function App() {
     if (isMobile) {
       setSidebarOpen(false);
     }
+  };
+
+  const toggleSidebar = () => {
+    if (isMobile) {
+      setMobileFiltersOpen(false);
+    }
+    setSidebarOpen((open) => !open);
+  };
+
+  const toggleMobileFilters = () => {
+    if (!isMobile) {
+      return;
+    }
+    setSidebarOpen(false);
+    setMobileFiltersOpen((open) => !open);
   };
 
   return (
@@ -99,7 +118,7 @@ export default function App() {
             <header className="topbar">
               <button
                 className="sidebar-toggle"
-                onClick={() => setSidebarOpen((open) => !open)}
+                onClick={toggleSidebar}
                 aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
                 aria-expanded={sidebarOpen}
                 aria-controls="sidebar"
@@ -110,8 +129,30 @@ export default function App() {
                   <span></span>
                 </span>
               </button>
-              <DateRangePicker value={dateParams} onChange={setDateParams} />
+              {isMobile ? (
+                <div className="mobile-topbar-main">
+                  <span className="mobile-page-title">Roon Dashboard</span>
+                  <button
+                    type="button"
+                    className={`mobile-filter-toggle ${mobileFiltersOpen ? 'active' : ''}`}
+                    onClick={toggleMobileFilters}
+                    aria-expanded={mobileFiltersOpen}
+                    aria-controls="mobile-filters"
+                  >
+                    Date Range
+                  </button>
+                </div>
+              ) : (
+                <DateRangePicker value={dateParams} onChange={setDateParams} />
+              )}
             </header>
+
+            {isMobile && mobileFiltersOpen && (
+              <div id="mobile-filters" className="mobile-filters-panel">
+                <DateRangePicker value={dateParams} onChange={setDateParams} />
+              </div>
+            )}
+
             <div className="content">
               <Routes>
                 <Route path="/" element={<Dashboard dateParams={dateParams} />} />
