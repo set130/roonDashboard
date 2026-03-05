@@ -35,23 +35,19 @@ export default function Recap({ dateParams }) {
   }
 
   const prev = () => {
-    if (slide > 0) {
-      setAnimating(true);
-      setTimeout(() => {
-        setSlide(slide - 1);
-        setAnimating(false);
-      }, 300);
-    }
+    setAnimating(true);
+    setTimeout(() => {
+      setSlide(slide > 0 ? slide - 1 : RECAP_SLIDES.length - 1);
+      setAnimating(false);
+    }, 300);
   };
 
   const next = () => {
-    if (slide < RECAP_SLIDES.length - 1) {
-      setAnimating(true);
-      setTimeout(() => {
-        setSlide(slide + 1);
-        setAnimating(false);
-      }, 300);
-    }
+    setAnimating(true);
+    setTimeout(() => {
+      setSlide(slide < RECAP_SLIDES.length - 1 ? slide + 1 : 0);
+      setAnimating(false);
+    }, 300);
   };
 
   const goTo = (index) => {
@@ -146,13 +142,13 @@ export default function Recap({ dateParams }) {
         {renderSlide()}
       </div>
       <div className="recap-nav">
-        <button onClick={prev} disabled={slide === 0}>← Back</button>
+        <button onClick={prev}>← Back</button>
         <div className="recap-dots">
           {RECAP_SLIDES.map((_, i) => (
             <span key={i} className={`dot ${i === slide ? 'active' : ''}`} onClick={() => goTo(i)} />
           ))}
         </div>
-        <button onClick={next} disabled={slide === RECAP_SLIDES.length - 1}>Next →</button>
+        <button onClick={next}>Next →</button>
       </div>
     </div>
   );
