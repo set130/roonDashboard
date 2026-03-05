@@ -54,14 +54,25 @@ function commitPlay(zoneState) {
 
 function handleZonesChanged(zones) {
   if (!zones) return;
+  console.log("[Tracker] ===== Processing " + zones.length + " zone(s) =====");
   for (var i = 0; i < zones.length; i++) {
     var zone = zones[i];
+    console.log("[Tracker] Zone: " + zone.display_name + " (ID: " + zone.zone_id + ")");
+    console.log("  - State: " + zone.state);
+    console.log("  - Has now_playing: " + (zone.now_playing ? "YES" : "NO"));
+    if (zone.now_playing && zone.now_playing.three_line) {
+      console.log("  - Track: " + zone.now_playing.three_line.line1);
+      console.log("  - Artist: " + zone.now_playing.three_line.line2);
+    }
+
     var key = trackKey(zone.now_playing);
     var prevState = zoneStates[zone.zone_id];
 
     // Handle stopped or no content - commit and clean up
     if (zone.state === "stopped" || !zone.now_playing) {
+      console.log("[Tracker] Processing zone: " + zone.display_name + " | State: " + zone.state + " | Has prev state: " + (prevState ? "YES" : "NO"));
       if (prevState && prevState.track) {
+        console.log("[Tracker] Committing play on stopped/no-content for zone: " + zone.display_name);
         // Clear any pending pause timeout
         if (prevState.pauseTimeout) {
           clearTimeout(prevState.pauseTimeout);
@@ -74,6 +85,7 @@ function handleZonesChanged(zones) {
 
     // Handle paused state - don't commit immediately, set a timeout
     if (zone.state === "paused") {
+      console.log("[Tracker] Processing paused zone: " + zone.display_name + " | Has prev state: " + (prevState ? "YES" : "NO"));
       if (prevState && prevState.track && !prevState.pausedAt) {
         // Track just paused
         prevState.pausedAt = new Date();
@@ -96,6 +108,13 @@ function handleZonesChanged(zones) {
     }
 
     // Handle playing/loading state
+    console.log("[Tracker] Processing zone: " + zone.display_name + " | State: " + zone.state + " | Has prev state: " + (prevState ? "YES" : "NO"));
+
+    // Log unexpected states
+    if (zone.state !== "playing" && zone.state !== "loading") {
+      console.log("[Tracker] ⚠ Unexpected state '" + zone.state + "' for zone with now_playing data: " + zone.display_name);
+    }
+
     var prevKey = null;
     if (prevState && prevState.track) {
       prevKey = prevState.track.track_title + "|||" + prevState.track.artist + "|||" + prevState.track.album;
@@ -117,12 +136,13 @@ function handleZonesChanged(zones) {
       prevState.pausedAt = null;
       prevState.pauseTimeout = null;
       prevState.state = zone.state;
-      prevState.seek_position = zone.now_playing.seek_position;
+      prevState.seek_position = zone.now_playing ? zone.now_playing.seek_position : 0;
       continue;
     }
 
     // Different track - commit previous and start new
     if (key !== prevKey) {
+      console.log("[Tracker] Track changed in zone: " + zone.display_name);
       if (prevState && prevState.track) {
         // Clear any pending pause timeout
         if (prevState.pauseTimeout) {
@@ -131,23 +151,30 @@ function handleZonesChanged(zones) {
         commitPlay(prevState);
       }
       var trackInfo = extractTrackInfo(zone);
+      if (!trackInfo) {
+        console.log("[Tracker] ✗ Failed to extract track info for zone: " + zone.display_name);
+        continue;
+      }
+      console.log("[Tracker] Extracted track info: " + trackInfo.track_title);
       zoneStates[zone.zone_id] = {
         zone_id: zone.zone_id,
         zone_name: zone.display_name,
         track: trackInfo,
         startedAt: new Date(),
         state: zone.state,
-        seek_position: zone.now_playing.seek_position,
+        seek_position: zone.now_playing ? zone.now_playing.seek_position : 0,
         pausedAt: null,
         pauseTimeout: null,
       };
-      console.log("[Tracker] Now playing: " + trackInfo.track_title + " by " + trackInfo.artist + " in " + zone.display_name);
+      console.log("[Tracker] ✓ Now tracking: " + trackInfo.track_title + " by " + trackInfo.artist + " in " + zone.display_name);
     } else if (prevState) {
       // Same track, just update state
+      console.log("[Tracker] Same track continuing in zone: " + zone.display_name);
       prevState.state = zone.state;
-      prevState.seek_position = zone.now_playing.seek_position;
+      prevState.seek_position = zone.now_playing ? zone.now_playing.seek_position : 0;
     }
   }
+  console.log("[Tracker] ===== Zone processing complete =====");
 }
 
 function handleZonesRemoved(zone_ids) {
