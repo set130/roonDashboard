@@ -46,14 +46,16 @@ function commitPlay(zoneState) {
   };
   try {
     insertPlay(play);
-    console.log("[Tracker] ✓ Logged: " + play.track_title + " by " + play.artist + " (" + play.played_secs + "s)");
+    console.log("[Tracker] ✓ Logged: " + play.track_title + " by " + play.artist + " (" + play.played_secs + "s) in zone " + play.zone_name);
   } catch (err) {
-    console.error("[Tracker] Failed to insert play:", err);
+    console.error("[Tracker] ✗ Failed to insert play for '" + play.track_title + "' in zone " + play.zone_name + ": " + err.message);
   }
 }
 
 function handleZonesChanged(zones) {
   if (!zones) return;
+  // Log all zones being processed
+  console.log("[Tracker] Zones received: " + zones.map(z => z.display_name + " (" + z.zone_id + ") [" + z.state + "]").join(", "));
   for (var i = 0; i < zones.length; i++) {
     var zone = zones[i];
     var key = trackKey(zone.now_playing);
@@ -131,17 +133,21 @@ function handleZonesChanged(zones) {
         commitPlay(prevState);
       }
       var trackInfo = extractTrackInfo(zone);
-      zoneStates[zone.zone_id] = {
-        zone_id: zone.zone_id,
-        zone_name: zone.display_name,
-        track: trackInfo,
-        startedAt: new Date(),
-        state: zone.state,
-        seek_position: zone.now_playing.seek_position,
-        pausedAt: null,
-        pauseTimeout: null,
-      };
-      console.log("[Tracker] Now playing: " + trackInfo.track_title + " by " + trackInfo.artist + " in " + zone.display_name);
+      if (trackInfo) {
+        zoneStates[zone.zone_id] = {
+          zone_id: zone.zone_id,
+          zone_name: zone.display_name,
+          track: trackInfo,
+          startedAt: new Date(),
+          state: zone.state,
+          seek_position: zone.now_playing ? zone.now_playing.seek_position : 0,
+          pausedAt: null,
+          pauseTimeout: null,
+        };
+        console.log("[Tracker] Now playing: " + trackInfo.track_title + " by " + trackInfo.artist + " in " + zone.display_name);
+      } else {
+        console.log("[Tracker] Warning: No track info available for zone " + zone.display_name);
+      }
     } else if (prevState) {
       // Same track, just update state
       prevState.state = zone.state;
@@ -152,6 +158,7 @@ function handleZonesChanged(zones) {
 
 function handleZonesRemoved(zone_ids) {
   if (!zone_ids) return;
+  console.log("[Tracker] Zones removed: " + zone_ids.join(", "));
   for (var i = 0; i < zone_ids.length; i++) {
     var id = zone_ids[i];
     if (zoneStates[id]) {
