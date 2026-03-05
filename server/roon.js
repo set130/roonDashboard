@@ -4,7 +4,6 @@ const RoonApiBrowse = require("node-roon-api-browse");
 const RoonApiImage = require("node-roon-api-image");
 const RoonApiStatus = require("node-roon-api-status");
 const { handleZonesChanged, handleZonesRemoved } = require("./tracker");
-const historyPoller = require("./history-poller");
 
 // Configuration from environment variables
 const ROON_CORE_IP = process.env.ROON_CORE_IP || "100.90.5.35";
@@ -35,12 +34,14 @@ const roon = new RoonApi({
 
     _transport.subscribe_zones(function (cmd, data) {
       console.log("[Roon] Zone subscription event: cmd=" + cmd);
+      console.log("[Roon] RAW EVENT DATA:", JSON.stringify(data, null, 2));
+
       if (cmd === "Subscribed" && data.zones) {
-        console.log("[Roon] Initial zones: " + data.zones.map(z => z.display_name).join(", "));
+        console.log("[Roon] Initial zones: " + data.zones.map(z => z.display_name + " (ID: " + z.zone_id + ")").join(", "));
         handleZonesChanged(data.zones);
       } else if (cmd === "Changed") {
         if (data.zones_changed) {
-          console.log("[Roon] zones_changed: " + data.zones_changed.map(z => z.display_name).join(", "));
+          console.log("[Roon] zones_changed: " + data.zones_changed.map(z => z.display_name + " (ID: " + z.zone_id + ")").join(", "));
           handleZonesChanged(data.zones_changed);
         }
         if (data.zones_removed) {
@@ -48,22 +49,18 @@ const roon = new RoonApi({
           handleZonesRemoved(data.zones_removed);
         }
         if (data.zones_added) {
-          console.log("[Roon] zones_added: " + data.zones_added.map(z => z.display_name).join(", "));
+          console.log("[Roon] zones_added: " + data.zones_added.map(z => z.display_name + " (ID: " + z.zone_id + ")").join(", "));
           handleZonesChanged(data.zones_added);
         }
       }
     });
 
-    // Initialize history poller for Arc and other plays that might not trigger zone events
-    console.log("[Roon] Initializing history poller for Arc plays...");
-    historyPoller.init(core);
 
     svcStatus.set_status("Connected to " + core.display_name, false);
   },
 
   core_unpaired: function (core) {
     console.log("[Roon] Core unpaired:", core.display_name);
-    historyPoller.stopPolling();
     _core = null;
     _transport = null;
     _image = null;
