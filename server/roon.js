@@ -33,15 +33,44 @@ const roon = new RoonApi({
     _image = core.services.RoonApiImage;
 
     _transport.subscribe_zones(function (cmd, data) {
+      console.log("[Roon] ========================================");
       console.log("[Roon] Zone subscription event: cmd=" + cmd);
-      console.log("[Roon] RAW EVENT DATA:", JSON.stringify(data, null, 2));
+      console.log("[Roon] Timestamp:", new Date().toISOString());
 
-      if (cmd === "Subscribed" && data.zones) {
-        console.log("[Roon] Initial zones: " + data.zones.map(z => z.display_name + " (ID: " + z.zone_id + ")").join(", "));
-        handleZonesChanged(data.zones);
+      // Log the complete raw data
+      if (data) {
+        console.log("[Roon] RAW EVENT DATA:");
+        console.log(JSON.stringify(data, null, 2));
+      }
+
+      if (cmd === "Subscribed") {
+        console.log("[Roon] ========================================");
+        console.log("[Roon] INITIAL SUBSCRIPTION - ALL ZONES:");
+        console.log("[Roon] ========================================");
+
+        if (data.zones) {
+          console.log("[Roon] Total zones found: " + data.zones.length);
+          data.zones.forEach(function(zone, idx) {
+            console.log("[Roon] Zone #" + (idx + 1) + ":");
+            console.log("  - Name: " + zone.display_name);
+            console.log("  - ID: " + zone.zone_id);
+            console.log("  - State: " + zone.state);
+            console.log("  - Outputs: " + (zone.outputs ? zone.outputs.length : 0));
+            if (zone.outputs) {
+              zone.outputs.forEach(function(output, outIdx) {
+                console.log("    Output #" + (outIdx + 1) + ": " + output.display_name + " (ID: " + output.output_id + ")");
+              });
+            }
+          });
+          handleZonesChanged(data.zones);
+        }
+        console.log("[Roon] ========================================");
       } else if (cmd === "Changed") {
         if (data.zones_changed) {
-          console.log("[Roon] zones_changed: " + data.zones_changed.map(z => z.display_name + " (ID: " + z.zone_id + ")").join(", "));
+          console.log("[Roon] zones_changed (" + data.zones_changed.length + "):");
+          data.zones_changed.forEach(function(zone) {
+            console.log("  - " + zone.display_name + " (ID: " + zone.zone_id + ") [" + zone.state + "]");
+          });
           handleZonesChanged(data.zones_changed);
         }
         if (data.zones_removed) {
@@ -49,10 +78,19 @@ const roon = new RoonApi({
           handleZonesRemoved(data.zones_removed);
         }
         if (data.zones_added) {
-          console.log("[Roon] zones_added: " + data.zones_added.map(z => z.display_name + " (ID: " + z.zone_id + ")").join(", "));
+          console.log("[Roon] zones_added (" + data.zones_added.length + "):");
+          data.zones_added.forEach(function(zone) {
+            console.log("  - " + zone.display_name + " (ID: " + zone.zone_id + ") [" + zone.state + "]");
+            if (zone.outputs) {
+              zone.outputs.forEach(function(output) {
+                console.log("    Output: " + output.display_name);
+              });
+            }
+          });
           handleZonesChanged(data.zones_added);
         }
       }
+      console.log("[Roon] ========================================");
     });
 
 

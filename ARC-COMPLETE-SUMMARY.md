@@ -1,7 +1,9 @@
-# Arc Plays Issue - Complete Summary
+# Arc Tracking - Complete Summary (UPDATED)
 
-## Problem
-Arc plays show in Roon's official History but not in the dashboard.
+## The Real Problem
+**Your iPhone Regular Roon App:** ✅ Gets tracked perfectly with accurate durations  
+**Your Arc App:** ❌ Doesn't get tracked at all  
+**Last.fm:** ❌ Only tracks "played or not", not "how long"
 
 ## Root Cause Analysis (from Claude)
 
