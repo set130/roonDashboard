@@ -694,6 +694,32 @@ body {
   color: var(--text-dim);
 }
 
+/* Infinite scroll loading states */
+.load-more-trigger {
+  padding: 20px;
+  text-align: center;
+  min-height: 40px;
+}
+
+.loading-text {
+  color: var(--amber);
+  font-size: 13px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.end-of-list {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-style: italic;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
 /* Recap */
 .recap-card {
   max-width: 620px;
