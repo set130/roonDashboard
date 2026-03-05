@@ -16,18 +16,20 @@ export default function Recap({ dateParams }) {
 
   if (!data) {
     return (
-      <div className="card recap-card">
-        <h3>Your Recap</h3>
-        <p className="empty-state">Loading...</p>
+      <div className="recap-card">
+        <div className="recap-viewport">
+          <p className="empty-state">Loading...</p>
+        </div>
       </div>
     );
   }
 
   if (data.total_plays === 0) {
     return (
-      <div className="card recap-card">
-        <h3>Your Recap</h3>
-        <p className="empty-state">No listening data yet. Start playing music!</p>
+      <div className="recap-card">
+        <div className="recap-viewport">
+          <p className="empty-state">No listening data yet. Start playing music!</p>
+        </div>
       </div>
     );
   }
@@ -139,8 +141,7 @@ export default function Recap({ dateParams }) {
   };
 
   return (
-    <div className="card recap-card">
-      <h3>Your Recap</h3>
+    <div className="recap-card">
       <div className={`recap-viewport ${animating ? 'fade-out' : 'fade-in'}`}>
         {renderSlide()}
       </div>
