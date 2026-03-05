@@ -25,6 +25,7 @@ body {
 .app {
   display: flex;
   min-height: 100vh;
+  position: relative;
 }
 
 /* Sidebar */
@@ -150,7 +151,8 @@ body {
   border-bottom: 1px solid var(--border);
   background: var(--bg-2);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  gap: 8px;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -170,6 +172,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
+  min-width: 0;
 }
 
 .range-buttons {
@@ -187,6 +191,7 @@ body {
   cursor: pointer;
   font-size: 12px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .range-btn:hover {
@@ -542,7 +547,12 @@ body {
 }
 
 /* Ranked lists */
-.chart-container { margin-bottom: 10px; }
+.chart-container {
+  margin-bottom: 10px;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
 
 .ranked-list {
   max-height: none;
@@ -870,27 +880,132 @@ body {
 /* Mobile */
 @media (max-width: 768px) {
   .sidebar {
-      width: 230px;
+    width: min(82vw, 280px);
+    padding-top: 64px;
+    z-index: 210;
+    box-shadow: 8px 0 24px rgba(0, 0, 0, 0.45);
   }
 
   .sidebar.collapsed {
-    transform: translateX(-230px);
+    transform: translateX(-100%);
   }
 
-  .main {
-    margin-left: 0;
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    border: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 180;
   }
 
+  .main,
   .main.expanded {
     margin-left: 0;
   }
 
-  .content { padding: 10px; }
+  .topbar {
+    padding: 10px 12px;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .sidebar-toggle {
+    margin-right: 0;
+    flex: 0 0 auto;
+  }
+
+  .range-buttons {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+
+  .custom-range-picker {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .range-separator {
+    display: none;
+  }
+
+  .calendar-popup {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    top: auto;
+    margin-top: 6px;
+    min-width: 0;
+    max-width: calc(100vw - 20px);
+  }
+
+  .content {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .playtime-stats {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .ranked-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .ranked-stats {
+    width: 100%;
+    margin-left: 30px;
+  }
 
   .history-header, .history-row {
     grid-template-columns: 36px 2fr 1fr 80px;
   }
-  .h-album, .h-zone, .h-date { display: none; }
+
+  .h-album, .h-zone, .h-date {
+    display: none;
+  }
+
+  .recap-viewport {
+    min-height: 340px;
+  }
+
+  .recap-slide {
+    padding: 20px 12px;
+  }
+
+  .recap-big {
+    font-size: 38px;
+  }
+
+  .recap-sub {
+    font-size: 15px;
+  }
+
+  .recap-art {
+    width: 180px;
+    height: 180px;
+  }
+
+  .recap-row {
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .recap-nav {
+    padding: 12px;
+  }
 }
 
 /* MUI Charts Legend - Force White Text */
@@ -906,4 +1021,3 @@ body {
 .MuiChartsAxis-tickLabel {
   fill: #ffffff !important;
 }
-
