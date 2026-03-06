@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const { startRoon, getImage, isConnected, historyPoller } = require("./roon");
+const { startRoon, getImage, isConnected } = require("./roon");
 const { getNowPlaying, flushAll } = require("./tracker");
 const statsRoutes = require("./routes/stats");
 const historyRoutes = require("./routes/history");
@@ -33,22 +33,6 @@ app.get("/api/status", (req, res) => {
   res.json({ connected: isConnected() });
 });
 
-// Debug: view raw Browse API diagnostic output
-app.get("/api/debug/browse", (req, res) => {
-  res.json({
-    connected: isConnected(),
-    diagnosticEntries: historyPoller.getDiagnosticLog(),
-  });
-});
-
-// Debug: trigger a fresh diagnostic poll
-app.post("/api/debug/browse", (req, res) => {
-  if (!isConnected()) {
-    return res.status(503).json({ error: "Not connected to Roon core" });
-  }
-  historyPoller.triggerDiagnostic();
-  res.json({ message: "Diagnostic poll triggered. GET /api/debug/browse in a few seconds to see results." });
-});
 
 // Image proxy
 app.get("/api/image/:image_key", (req, res) => {
@@ -88,13 +72,11 @@ process.on("uncaughtException", (err) => {
 process.on("SIGINT", () => {
   console.log("\n[Server] Shutting down...");
   flushAll();
-  historyPoller.cleanup();
   process.exit(0);
 });
 
 process.on("SIGTERM", () => {
   flushAll();
-  historyPoller.cleanup();
   process.exit(0);
 });
 

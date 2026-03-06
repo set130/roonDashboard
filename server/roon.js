@@ -4,7 +4,6 @@ const RoonApiBrowse = require("node-roon-api-browse");
 const RoonApiImage = require("node-roon-api-image");
 const RoonApiStatus = require("node-roon-api-status");
 const { handleZonesChanged, handleZonesRemoved } = require("./tracker");
-const historyPoller = require("./history-poller");
 
 // Configuration from environment variables
 const ROON_CORE_IP = process.env.ROON_CORE_IP || "100.90.5.35";
@@ -96,9 +95,6 @@ const roon = new RoonApi({
 
 
     svcStatus.set_status("Connected to " + core.display_name, false);
-
-    // Start polling Roon's browse-based play history
-    historyPoller.init(core);
   },
 
   core_unpaired: function (core) {
@@ -106,7 +102,6 @@ const roon = new RoonApi({
     _core = null;
     _transport = null;
     _image = null;
-    historyPoller.cleanup();
     svcStatus.set_status("Disconnected", true);
   },
 });
@@ -167,5 +162,5 @@ function isConnected() {
   return _core !== null;
 }
 
-module.exports = { startRoon, getImage, isConnected, roon, historyPoller };
+module.exports = { startRoon, getImage, isConnected, roon };
 
