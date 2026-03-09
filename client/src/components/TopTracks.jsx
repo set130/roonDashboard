@@ -2,20 +2,47 @@ import { useState, useEffect } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { getTopTracks, imageUrl } from '../api/roon';
 
+const MOBILE_BREAKPOINT = 768;
+
+function isMobileViewport() {
+  return typeof window !== 'undefined' && window.innerWidth <= MOBILE_BREAKPOINT;
+}
+
 export default function TopTracks({ dateParams }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(isMobileViewport);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
+    const onChange = (event) => setIsMobile(event.matches);
+
+    setIsMobile(mediaQuery.matches);
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', onChange);
+    } else {
+      mediaQuery.addListener(onChange);
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', onChange);
+      } else {
+        mediaQuery.removeListener(onChange);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     setLoading(true);
-    getTopTracks({ ...dateParams, limit: 10 })
+    getTopTracks({ ...dateParams, limit: isMobile ? 8 : 10 })
       .then(setData)
       .catch((err) => {
         console.error('Failed to fetch top tracks:', err);
         setData([]);
       })
       .finally(() => setLoading(false));
-  }, [dateParams?.range, dateParams?.from, dateParams?.to]);
+  }, [dateParams?.range, dateParams?.from, dateParams?.to, isMobile]);
 
   if (loading) {
     return (
@@ -35,28 +62,29 @@ export default function TopTracks({ dateParams }) {
     );
   }
 
-  // Prepare data for MUI chart
   const trackNames = data.map((t) => `${t.track_title}`);
-  const playTimes = data.map((t) => Math.round(t.total_secs / 60)); // Convert to minutes
+  const playTimes = data.map((t) => Math.round(t.total_secs / 60));
+  const chartHeight = isMobile ? 240 : 400;
+  const chartMargin = isMobile
+    ? { bottom: 34, left: 40, right: 8, top: 16 }
+    : { bottom: 100, left: 50, right: 10, top: 20 };
+  const xTickStyle = isMobile
+    ? { angle: -20, textAnchor: 'end', fontSize: 10, fill: '#ffffff' }
+    : { angle: -45, textAnchor: 'end', fontSize: 12, fill: '#ffffff' };
 
   return (
     <div className="card top-tracks-card">
       <h3>Top Tracks</h3>
-      <div className="chart-container" style={{ width: '100%', overflowX: 'auto' }}>
+      <div className="chart-container">
         <BarChart
           xAxis={[{
             scaleType: 'band',
             data: trackNames,
-            tickLabelStyle: {
-              angle: -45,
-              textAnchor: 'end',
-              fontSize: 12,
-              fill: '#ffffff'
-            }
+            tickLabelStyle: xTickStyle
           }]}
           yAxis={[{
             tickLabelStyle: {
-              fontSize: 12,
+              fontSize: isMobile ? 10 : 12,
               fill: '#ffffff'
             }
           }]}
@@ -65,20 +93,20 @@ export default function TopTracks({ dateParams }) {
             label: 'Minutes',
             color: '#00cec9'
           }]}
-          height={400}
-          margin={{ bottom: 100, left: 50, right: 10, top: 20 }}
+          height={chartHeight}
+          margin={chartMargin}
           slotProps={{
             legend: {
               labelStyle: {
                 fill: '#ffffff',
-                fontSize: '12px'
+                fontSize: isMobile ? '11px' : '12px'
               }
             }
           }}
           sx={{
             '& .MuiChartsAxis-tickLabel': {
               fill: '#ffffff',
-              fontSize: '12px'
+              fontSize: isMobile ? '10px' : '12px'
             },
             '& .MuiChartsAxis-line': {
               stroke: '#666'
@@ -118,4 +146,3 @@ export default function TopTracks({ dateParams }) {
     </div>
   );
 }
-

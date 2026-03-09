@@ -33,6 +33,7 @@ app.get("/api/status", (req, res) => {
   res.json({ connected: isConnected() });
 });
 
+
 // Image proxy
 app.get("/api/image/:image_key", (req, res) => {
   const opts = {

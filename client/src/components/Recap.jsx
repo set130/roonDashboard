@@ -16,40 +16,38 @@ export default function Recap({ dateParams }) {
 
   if (!data) {
     return (
-      <div className="card recap-card">
-        <h3>Your Recap</h3>
-        <p className="empty-state">Loading...</p>
+      <div className="recap-card">
+        <div className="recap-viewport">
+          <p className="empty-state">Loading...</p>
+        </div>
       </div>
     );
   }
 
   if (data.total_plays === 0) {
     return (
-      <div className="card recap-card">
-        <h3>Your Recap</h3>
-        <p className="empty-state">No listening data yet. Start playing music!</p>
+      <div className="recap-card">
+        <div className="recap-viewport">
+          <p className="empty-state">No listening data yet. Start playing music!</p>
+        </div>
       </div>
     );
   }
 
   const prev = () => {
-    if (slide > 0) {
-      setAnimating(true);
-      setTimeout(() => {
-        setSlide(slide - 1);
-        setAnimating(false);
-      }, 300);
-    }
+    setAnimating(true);
+    setTimeout(() => {
+      setSlide(slide > 0 ? slide - 1 : RECAP_SLIDES.length - 1);
+      setAnimating(false);
+    }, 300);
   };
 
   const next = () => {
-    if (slide < RECAP_SLIDES.length - 1) {
-      setAnimating(true);
-      setTimeout(() => {
-        setSlide(slide + 1);
-        setAnimating(false);
-      }, 300);
-    }
+    setAnimating(true);
+    setTimeout(() => {
+      setSlide(slide < RECAP_SLIDES.length - 1 ? slide + 1 : 0);
+      setAnimating(false);
+    }, 300);
   };
 
   const goTo = (index) => {
@@ -139,19 +137,18 @@ export default function Recap({ dateParams }) {
   };
 
   return (
-    <div className="card recap-card">
-      <h3>Your Recap</h3>
+    <div className="recap-card">
       <div className={`recap-viewport ${animating ? 'fade-out' : 'fade-in'}`}>
         {renderSlide()}
       </div>
       <div className="recap-nav">
-        <button onClick={prev} disabled={slide === 0}>← Back</button>
+        <button onClick={prev}>← Back</button>
         <div className="recap-dots">
           {RECAP_SLIDES.map((_, i) => (
             <span key={i} className={`dot ${i === slide ? 'active' : ''}`} onClick={() => goTo(i)} />
           ))}
         </div>
-        <button onClick={next} disabled={slide === RECAP_SLIDES.length - 1}>Next →</button>
+        <button onClick={next}>Next →</button>
       </div>
     </div>
   );
