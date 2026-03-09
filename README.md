@@ -421,9 +421,9 @@ MIT
 ## Support & Documentation
 
 For detailed information:
-- **Setup & Deployment:** See [DEPLOYMENT.md](./DEPLOYMENT.md)
-- **Quick Start:** See [QUICKSTART.md](./QUICKSTART.md)
-- **Server Updates:** See [SERVER-UPDATE-GUIDE.md](./SERVER-UPDATE-GUIDE.md)
+- **Setup & Deployment:** See [DEPLOYMENT.md](aiShit/DEPLOYMENT.md)
+- **Quick Start:** See [QUICKSTART.md](aiShit/QUICKSTART.md)
+- **Server Updates:** See [SERVER-UPDATE-GUIDE.md](aiShit/SERVER-UPDATE-GUIDE.md)
 - **Server Logs:** `sudo journalctl -u roon-dashboard -f`
 
 ---

@@ -246,5 +246,5 @@ sudo journalctl -u roon-dashboard -f
 
 You have everything needed to deploy! Choose your method and follow the steps above.
 
-Need help? See [DEPLOYMENT-SUMMARY.md](./DEPLOYMENT-SUMMARY.md) or [QUICKSTART.md](./QUICKSTART.md)
+Need help? See [DEPLOYMENT-SUMMARY.md](DEPLOYMENT-SUMMARY.md) or [QUICKSTART.md](../QUICKSTART.md)
 

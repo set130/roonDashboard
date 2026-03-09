@@ -2,10 +2,10 @@
 
 ## 📋 Quick Start
 
-1. **Read this first:** [QUICK_FIX_REFERENCE.md](QUICK_FIX_REFERENCE.md)
-2. **Understand the issue:** [VISUAL_GUIDE.md](VISUAL_GUIDE.md)  
+1. **Read this first:** [QUICK_FIX_REFERENCE.md](../QUICK_FIX_REFERENCE.md)
+2. **Understand the issue:** [VISUAL_GUIDE.md](../VISUAL_GUIDE.md)  
 3. **Deploy the fix:** [DEPLOYMENT-COMMANDS.md](DEPLOYMENT-COMMANDS.md)
-4. **Verify it works:** [PRE-DEPLOYMENT-CHECKLIST.md](PRE-DEPLOYMENT-CHECKLIST.md)
+4. **Verify it works:** [PRE-DEPLOYMENT-CHECKLIST.md](../PRE-DEPLOYMENT-CHECKLIST.md)
 
 ---
 
@@ -42,8 +42,8 @@ Environment="ROON_CORE_IP=192.168.0.25"  ← Changed from "localhost"
 ### Core Documentation
 | File | Purpose |
 |------|---------|
-| [QUICK_FIX_REFERENCE.md](QUICK_FIX_REFERENCE.md) | One-page summary of the fix |
-| [VISUAL_GUIDE.md](VISUAL_GUIDE.md) | Diagrams showing before/after |
+| [QUICK_FIX_REFERENCE.md](../QUICK_FIX_REFERENCE.md) | One-page summary of the fix |
+| [VISUAL_GUIDE.md](../VISUAL_GUIDE.md) | Diagrams showing before/after |
 | [DEPLOYMENT-FIX.md](DEPLOYMENT-FIX.md) | Detailed explanation |
 | [COMPLETE_DEPLOYMENT_SUMMARY.md](COMPLETE_DEPLOYMENT_SUMMARY.md) | Full technical summary |
 
@@ -51,9 +51,9 @@ Environment="ROON_CORE_IP=192.168.0.25"  ← Changed from "localhost"
 | File | Purpose |
 |------|---------|
 | [DEPLOYMENT-COMMANDS.md](DEPLOYMENT-COMMANDS.md) | Step-by-step deployment instructions |
-| [PRE-DEPLOYMENT-CHECKLIST.md](PRE-DEPLOYMENT-CHECKLIST.md) | Verification checklist |
-| [deploy.sh](deploy.sh) | Automated deployment script |
-| [verify_deployment.sh](verify_deployment.sh) | Verification script |
+| [PRE-DEPLOYMENT-CHECKLIST.md](../PRE-DEPLOYMENT-CHECKLIST.md) | Verification checklist |
+| [deploy.sh](../deploy.sh) | Automated deployment script |
+| [verify_deployment.sh](../verify_deployment.sh) | Verification script |
 
 ---
 
@@ -107,7 +107,7 @@ curl http://192.168.0.25:3001/api/status
 ## 🐛 Troubleshooting
 
 ### Still seeing "ERROR undefined"?
-→ See [PRE-DEPLOYMENT-CHECKLIST.md#troubleshooting](PRE-DEPLOYMENT-CHECKLIST.md)
+→ See [PRE-DEPLOYMENT-CHECKLIST.md#troubleshooting](../PRE-DEPLOYMENT-CHECKLIST.md)
 
 ### Extension doesn't appear in Roon?
 → Check logs: `sudo journalctl -u roon-dashboard -n 100 --no-pager`

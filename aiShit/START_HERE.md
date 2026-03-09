@@ -22,9 +22,9 @@ sudo systemctl start roon-dashboard
 ```
 
 ### 📖 Guided: Follow a Guide
-- **5 minutes?** → [QUICKSTART.md](./QUICKSTART.md)
+- **5 minutes?** → [QUICKSTART.md](QUICKSTART.md)
 - **Full setup?** → [DEPLOYMENT.md](./DEPLOYMENT.md)
-- **Docker?** → [DOCKER.md](./DOCKER.md)
+- **Docker?** → [DOCKER.md](../DOCKER.md)
 - **Troubleshooting?** → [DEPLOYMENT-SUMMARY.md](./DEPLOYMENT-SUMMARY.md)
 
 ---
@@ -33,10 +33,10 @@ sudo systemctl start roon-dashboard
 
 | You Want To... | Read This |
 |---|---|
-| **Understand what you have** | [README.md](./README.md) |
-| **Deploy in 5 minutes** | [QUICKSTART.md](./QUICKSTART.md) |
+| **Understand what you have** | [README.md](../README.md) |
+| **Deploy in 5 minutes** | [QUICKSTART.md](QUICKSTART.md) |
 | **Deploy the right way** | [DEPLOYMENT.md](./DEPLOYMENT.md) |
-| **Use Docker** | [DOCKER.md](./DOCKER.md) |
+| **Use Docker** | [DOCKER.md](../DOCKER.md) |
 | **Overview & troubleshoot** | [DEPLOYMENT-SUMMARY.md](./DEPLOYMENT-SUMMARY.md) |
 | **Verify step-by-step** | [DEPLOYMENT-CHECKLIST.md](./DEPLOYMENT-CHECKLIST.md) |
 
@@ -152,13 +152,13 @@ nano .env
 ## 🚢 Deployment Paths
 
 ### Path A: I want it done in 5 minutes
-→ [QUICKSTART.md](./QUICKSTART.md)
+→ [QUICKSTART.md](QUICKSTART.md)
 
 ### Path B: I want to understand everything
 → [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ### Path C: I want to use Docker
-→ [DOCKER.md](./DOCKER.md)
+→ [DOCKER.md](../DOCKER.md)
 
 ### Path D: I want step-by-step verification
 → [DEPLOYMENT-CHECKLIST.md](./DEPLOYMENT-CHECKLIST.md)

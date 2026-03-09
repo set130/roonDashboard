@@ -261,13 +261,13 @@ sudo systemctl restart roon-dashboard
 
 ## 📞 Support
 
-**Quick Questions?** See: [QUICKSTART.md](./QUICKSTART.md)
+**Quick Questions?** See: [QUICKSTART.md](../QUICKSTART.md)
 
-**Detailed Setup?** See: [DEPLOYMENT.md](./DEPLOYMENT.md)
+**Detailed Setup?** See: [DEPLOYMENT.md](DEPLOYMENT.md)
 
-**Docker Setup?** See: [DOCKER.md](./DOCKER.md)
+**Docker Setup?** See: [DOCKER.md](../DOCKER.md)
 
-**Full Docs?** See: [README.md](./README.md)
+**Full Docs?** See: [README.md](../README.md)
 
 ---
 

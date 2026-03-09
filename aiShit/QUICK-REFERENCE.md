@@ -47,10 +47,10 @@ curl http://your-server/
 
 | Need | File |
 |------|------|
-| Start | [START_HERE.md](./START_HERE.md) |
-| 5-min setup | [QUICKSTART.md](./QUICKSTART.md) |
+| Start | [START_HERE.md](START_HERE.md) |
+| 5-min setup | [QUICKSTART.md](QUICKSTART.md) |
 | Detailed | [DEPLOYMENT.md](./DEPLOYMENT.md) |
-| Docker | [DOCKER.md](./DOCKER.md) |
+| Docker | [DOCKER.md](../DOCKER.md) |
 | Help | [DEPLOYMENT-SUMMARY.md](./DEPLOYMENT-SUMMARY.md) |
 | Checklist | [DEPLOYMENT-CHECKLIST.md](./DEPLOYMENT-CHECKLIST.md) |
 
@@ -142,7 +142,7 @@ GET /api/image/[image_key]
 
 ## 📞 Need Help?
 
-1. Check [START_HERE.md](./START_HERE.md)
+1. Check [START_HERE.md](START_HERE.md)
 2. Read [DEPLOYMENT-SUMMARY.md](./DEPLOYMENT-SUMMARY.md#troubleshooting)
 3. View logs: `sudo journalctl -u roon-dashboard -f`
 4. Check [DEPLOYMENT-CHECKLIST.md](./DEPLOYMENT-CHECKLIST.md)

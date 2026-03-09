@@ -97,13 +97,13 @@ sudo systemctl start roon-dashboard
 ```
 
 **📖 Guided (Read Documentation)**
-Start with [START_HERE.md](./START_HERE.md)
+Start with [START_HERE.md](../START_HERE.md)
 
 ---
 
 ## 🚀 Next Steps
 
-1. **Read** [START_HERE.md](./START_HERE.md) - 2 minute overview
+1. **Read** [START_HERE.md](../START_HERE.md) - 2 minute overview
 2. **Choose** your deployment method
 3. **Follow** the relevant guide
 4. **Verify** with the checklist
@@ -172,14 +172,14 @@ Start with [START_HERE.md](./START_HERE.md)
 
 | Need | File |
 |------|------|
-| Quick start | [START_HERE.md](./START_HERE.md) |
-| 5-min setup | [QUICKSTART.md](./QUICKSTART.md) |
-| Full details | [DEPLOYMENT.md](./DEPLOYMENT.md) |
-| Docker | [DOCKER.md](./DOCKER.md) |
-| Troubleshooting | [DEPLOYMENT-SUMMARY.md](./DEPLOYMENT-SUMMARY.md) |
-| Checklist | [DEPLOYMENT-CHECKLIST.md](./DEPLOYMENT-CHECKLIST.md) |
-| File tree | [PROJECT-INDEX.md](./PROJECT-INDEX.md) |
-| Quick ref | [QUICK-REFERENCE.md](./QUICK-REFERENCE.md) |
+| Quick start | [START_HERE.md](../START_HERE.md) |
+| 5-min setup | [QUICKSTART.md](../QUICKSTART.md) |
+| Full details | [DEPLOYMENT.md](../DEPLOYMENT.md) |
+| Docker | [DOCKER.md](../DOCKER.md) |
+| Troubleshooting | [DEPLOYMENT-SUMMARY.md](../DEPLOYMENT-SUMMARY.md) |
+| Checklist | [DEPLOYMENT-CHECKLIST.md](../DEPLOYMENT-CHECKLIST.md) |
+| File tree | [PROJECT-INDEX.md](../PROJECT-INDEX.md) |
+| Quick ref | [QUICK-REFERENCE.md](../QUICK-REFERENCE.md) |
 
 ---
 
@@ -254,7 +254,7 @@ Then:
 
 ---
 
-**Start deploying now with [START_HERE.md](./START_HERE.md)**
+**Start deploying now with [START_HERE.md](../START_HERE.md)**
 
 **Your music statistics await! 🎵**
 

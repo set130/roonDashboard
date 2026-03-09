@@ -142,7 +142,7 @@ Created comprehensive guides covering every aspect:
 
 ## 📖 How to Use
 
-1. **Read** [START_HERE.md](./START_HERE.md) (2 minutes)
+1. **Read** [START_HERE.md](../START_HERE.md) (2 minutes)
 2. **Choose** a deployment option
 3. **Follow** the relevant guide
 4. **Verify** with the checklist
@@ -169,7 +169,7 @@ Everything is complete and production-ready:
 
 **You have everything needed to deploy your Roon Dashboard on your server!**
 
-Start with [START_HERE.md](./START_HERE.md) and choose your deployment path.
+Start with [START_HERE.md](../START_HERE.md) and choose your deployment path.
 
 **Happy listening! 🎵**
 
