@@ -2,7 +2,6 @@
 // This simulates the zone state changes that happen during pause/resume
 
 const tracker = require('./server/tracker');
-
 console.log('=== Testing Pause/Resume Behavior ===\n');
 
 // Simulate a track starting to play
