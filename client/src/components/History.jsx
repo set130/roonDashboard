@@ -8,9 +8,12 @@ export default function History({dateParams}) {
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const observerTarget = useRef(null);
+    const isFetchingRef = useRef(false);
 
     // Reset when date params change
     useEffect(() => {
+        isFetchingRef.current = false;
+        setLoading(false);
         setAllRows([]);
         setPage(1);
         setHasMore(true);
@@ -19,48 +22,64 @@ export default function History({dateParams}) {
 
     // Load data when page changes
     useEffect(() => {
-        if (!hasMore || loading) return;
+        if (!hasMore || isFetchingRef.current) return;
 
+        let cancelled = false;
+        isFetchingRef.current = true;
         setLoading(true);
+
         getHistory({...dateParams, page, limit: 100})
             .then((data) => {
-                setTotal(data.total);
+                if (cancelled) return;
+                setTotal(data.total || 0);
                 setAllRows(prev => {
-                    // Avoid duplicates when page=1
                     if (page === 1) return data.rows;
-                    return [...prev, ...data.rows];
+                    const seen = new Set(prev.map(row => row.id));
+                    const nextRows = data.rows.filter(row => !seen.has(row.id));
+                    return [...prev, ...nextRows];
                 });
-                // Check if we have more data
-                setHasMore(data.rows.length === 100 && (page * 100) < data.total);
-                setLoading(false);
+                setHasMore((data.rows?.length || 0) === 100 && (page * 100) < (data.total || 0));
             })
             .catch((err) => {
-                console.error(err);
-                setLoading(false);
+                if (!cancelled) {
+                    console.error(err);
+                    setHasMore(false);
+                }
+            })
+            .finally(() => {
+                if (!cancelled) {
+                    isFetchingRef.current = false;
+                    setLoading(false);
+                }
             });
-    }, [dateParams, page, hasMore, loading]);
+
+        return () => {
+            cancelled = true;
+            isFetchingRef.current = false;
+        };
+    }, [dateParams.range, dateParams.from, dateParams.to, page, hasMore]);
 
     // Infinite scroll observer
     useEffect(() => {
+        const target = observerTarget.current;
+        if (!target) return;
+
         const observer = new IntersectionObserver(
             entries => {
-                if (entries[0].isIntersecting && hasMore && !loading) {
+                if (entries[0]?.isIntersecting && hasMore && !isFetchingRef.current) {
                     setPage(prev => prev + 1);
                 }
             },
             {threshold: 0.1}
         );
 
-        if (observerTarget.current) {
-            observer.observe(observerTarget.current);
-        }
+        observer.observe(target);
 
         return () => {
-            if (observerTarget.current) {
-                observer.unobserve(observerTarget.current);
-            }
+            observer.unobserve(target);
+            observer.disconnect();
         };
-    }, [hasMore, loading]);
+    }, [hasMore]);
 
     return (
         <div className="card history-card">
@@ -127,4 +146,3 @@ function formatDate(iso) {
     const d = new Date(iso);
     return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
 }
-
