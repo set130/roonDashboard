@@ -8,11 +8,9 @@ export default function History({dateParams}) {
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const observerTarget = useRef(null);
-    const isFetchingRef = useRef(false);
 
     // Reset when date params change
     useEffect(() => {
-        isFetchingRef.current = false;
         setLoading(false);
         setAllRows([]);
         setPage(1);
@@ -22,23 +20,25 @@ export default function History({dateParams}) {
 
     // Load data when page changes
     useEffect(() => {
-        if (!hasMore || isFetchingRef.current) return;
+        if (!hasMore) return;
 
         let cancelled = false;
-        isFetchingRef.current = true;
         setLoading(true);
 
         getHistory({...dateParams, page, limit: 100})
             .then((data) => {
                 if (cancelled) return;
-                setTotal(data.total || 0);
+                const rows = Array.isArray(data.rows) ? data.rows : [];
+                const totalRows = data.total || 0;
+
+                setTotal(totalRows);
                 setAllRows(prev => {
-                    if (page === 1) return data.rows;
+                    if (page === 1) return rows;
                     const seen = new Set(prev.map(row => row.id));
-                    const nextRows = data.rows.filter(row => !seen.has(row.id));
+                    const nextRows = rows.filter(row => !seen.has(row.id));
                     return [...prev, ...nextRows];
                 });
-                setHasMore((data.rows?.length || 0) === 100 && (page * 100) < (data.total || 0));
+                setHasMore((page * 100) < totalRows && rows.length > 0);
             })
             .catch((err) => {
                 if (!cancelled) {
@@ -48,25 +48,23 @@ export default function History({dateParams}) {
             })
             .finally(() => {
                 if (!cancelled) {
-                    isFetchingRef.current = false;
                     setLoading(false);
                 }
             });
 
         return () => {
             cancelled = true;
-            isFetchingRef.current = false;
         };
     }, [dateParams.range, dateParams.from, dateParams.to, page, hasMore]);
 
     // Infinite scroll observer
     useEffect(() => {
         const target = observerTarget.current;
-        if (!target) return;
+        if (!target || !hasMore) return;
 
         const observer = new IntersectionObserver(
             entries => {
-                if (entries[0]?.isIntersecting && hasMore && !isFetchingRef.current) {
+                if (entries[0]?.isIntersecting && !loading) {
                     setPage(prev => prev + 1);
                 }
             },
@@ -79,7 +77,7 @@ export default function History({dateParams}) {
             observer.unobserve(target);
             observer.disconnect();
         };
-    }, [hasMore]);
+    }, [hasMore, loading]);
 
     return (
         <div className="card history-card">
