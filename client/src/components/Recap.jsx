@@ -14,6 +14,32 @@ export default function Recap({ dateParams }) {
     getRecap(dateParams).then(setData).catch(console.error);
   }, [dateParams.range, dateParams.from, dateParams.to]);
 
+  const prev = () => {
+    setAnimating(true);
+    setTimeout(() => {
+      setSlide(s => (s > 0 ? s - 1 : RECAP_SLIDES.length - 1));
+      setAnimating(false);
+    }, 300);
+  };
+
+  const next = () => {
+    setAnimating(true);
+    setTimeout(() => {
+      setSlide(s => (s < RECAP_SLIDES.length - 1 ? s + 1 : 0));
+      setAnimating(false);
+    }, 300);
+  };
+
+  useEffect(() => {
+    if (!data || data.total_plays === 0) return;
+    const handleKey = (e) => {
+      if (e.key === 'ArrowLeft') prev();
+      if (e.key === 'ArrowRight') next();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [data]);
+
   if (!data) {
     return (
       <div className="recap-card">
@@ -33,22 +59,6 @@ export default function Recap({ dateParams }) {
       </div>
     );
   }
-
-  const prev = () => {
-    setAnimating(true);
-    setTimeout(() => {
-      setSlide(slide > 0 ? slide - 1 : RECAP_SLIDES.length - 1);
-      setAnimating(false);
-    }, 300);
-  };
-
-  const next = () => {
-    setAnimating(true);
-    setTimeout(() => {
-      setSlide(slide < RECAP_SLIDES.length - 1 ? slide + 1 : 0);
-      setAnimating(false);
-    }, 300);
-  };
 
   const goTo = (index) => {
     if (index !== slide) {
