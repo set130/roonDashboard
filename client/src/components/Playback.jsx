@@ -31,8 +31,8 @@ export default function Playback() {
         .then(([artistsData, albumsData]) => {
             const artists = {};
             const albums = {};
-            (artistsData || []).forEach(a => artists[a.artist] = a.count || 0);
-            (albumsData || []).forEach(a => albums[a.album] = a.count || 0);
+            (artistsData || []).forEach(a => artists[a.artist] = a.play_count || 0);
+            (albumsData || []).forEach(a => albums[a.album] = a.play_count || 0);
             setTopStats({ artists, albums });
         })
         .catch(err => console.error("Failed to load stats for sorting", err));
@@ -156,7 +156,10 @@ export default function Playback() {
             const subB = b.subtitle || '';
 
             if (sortBy === 'Artist') {
-                return subA.localeCompare(subB) || titleA.localeCompare(titleB);
+                // If subtitles are identical (or empty), sort by title
+                const cmp = subA.localeCompare(subB);
+                if (cmp !== 0) return cmp;
+                return titleA.localeCompare(titleB);
             }
             if (sortBy === 'Album title') {
                 return titleA.localeCompare(titleB);
@@ -165,17 +168,19 @@ export default function Playback() {
                 // Check if it's likely an album or artist
                 const scoreA = Math.max(topStats.albums[titleA] || 0, topStats.artists[titleA] || 0);
                 const scoreB = Math.max(topStats.albums[titleB] || 0, topStats.artists[titleB] || 0);
-                return scoreB - scoreA;
+                if (scoreA !== scoreB) return scoreB - scoreA;
+                return titleA.localeCompare(titleB);
             }
-            if (sortBy === 'Date' || sortBy === 'Date added (if possible)') {
-                // Try to extract year from subtitle (e.g. "Pink Floyd • 1973")
+            if (sortBy === 'Date' || sortBy === 'Date added') {
+                // Try to extract year from subtitle or title (e.g. "Pink Floyd • 1973")
                 const extractYear = (str) => {
                     const match = str.match(/\b(19|20)\d{2}\b/);
                     return match ? parseInt(match[0], 10) : 0;
                 };
-                const yearA = extractYear(subA);
-                const yearB = extractYear(subB);
-                return yearB - yearA; // Newest first
+                const yearA = Math.max(extractYear(subA), extractYear(titleA));
+                const yearB = Math.max(extractYear(subB), extractYear(titleB));
+                if (yearA !== yearB) return yearB - yearA; // Newest first
+                return titleA.localeCompare(titleB);
             }
             return 0;
         });
@@ -337,7 +342,7 @@ export default function Playback() {
                             <option value="Default">Default</option>
                             <option value="Artist">Artist</option>
                             <option value="Most played">Most played</option>
-                            <option value="Date added (if possible)">Date added (if possible)</option>
+                            <option value="Date added">Date added</option>
                             <option value="Date">Date</option>
                             <option value="Album title">Album title</option>
                         </select>
