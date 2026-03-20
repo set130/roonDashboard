@@ -154,7 +154,7 @@ function AppContent() {
             ) : (
               <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                  {isLibrary ? (
-                    <div id="library-topbar-portal-target"></div>
+                    <div id="library-topbar-portal-target" style={{ width: '100%' }}></div>
                  ) : (
                     <DateRangePicker value={dateParams} onChange={setDateParams} />
                  )}
