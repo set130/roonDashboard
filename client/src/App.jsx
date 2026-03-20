@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import History from './components/History';
 import Recap from './components/Recap';
@@ -17,11 +17,12 @@ function isPhoneViewport() {
   return window.innerWidth <= MOBILE_BREAKPOINT;
 }
 
-export default function App() {
+function AppContent() {
   const [dateParams, setDateParams] = useState({ range: 'all', from: null, to: null });
   const [isMobile, setIsMobile] = useState(isPhoneViewport);
   const [sidebarOpen, setSidebarOpen] = useState(() => !isPhoneViewport());
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
@@ -87,84 +88,94 @@ export default function App() {
     setMobileFiltersOpen((open) => !open);
   };
 
+  const isPlayback = location.pathname === '/playback';
+
+  return (
+    <div className={`app ${isMobile ? 'mobile' : 'desktop'}`}>
+      <aside
+        id="sidebar"
+        className={`sidebar ${sidebarOpen ? '' : 'collapsed'}`}
+        aria-hidden={isMobile && !sidebarOpen}
+      >
+        <div className="sidebar-brand">
+          <h1>Roon Dashboard</h1>
+        </div>
+        <nav className="sidebar-nav">
+          <NavLink to="/" end onClick={closeSidebarOnMobile}>Dashboard</NavLink>
+          <NavLink to="/playback" onClick={closeSidebarOnMobile}>Playback</NavLink>
+          <NavLink to="/history" onClick={closeSidebarOnMobile}>History</NavLink>
+          <NavLink to="/recap" onClick={closeSidebarOnMobile}>Recap</NavLink>
+        </nav>
+      </aside>
+
+      {isMobile && sidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <main className={`main ${sidebarOpen ? '' : 'expanded'}`}>
+        {!isPlayback && (
+          <header className="topbar">
+            <button
+              className="sidebar-toggle"
+              onClick={toggleSidebar}
+              aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+              aria-expanded={sidebarOpen}
+              aria-controls="sidebar"
+            >
+              <span className="hamburger-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </button>
+            {isMobile ? (
+              <div className="mobile-topbar-main">
+                <span className="mobile-page-title">Roon Dashboard</span>
+                <button
+                  type="button"
+                  className={`mobile-filter-toggle ${mobileFiltersOpen ? 'active' : ''}`}
+                  onClick={toggleMobileFilters}
+                  aria-expanded={mobileFiltersOpen}
+                  aria-controls="mobile-filters"
+                >
+                  Date Range
+                </button>
+              </div>
+            ) : (
+              <DateRangePicker value={dateParams} onChange={setDateParams} />
+            )}
+          </header>
+        )}
+
+        {!isPlayback && isMobile && mobileFiltersOpen && (
+          <div id="mobile-filters" className="mobile-filters-panel">
+            <DateRangePicker value={dateParams} onChange={setDateParams} />
+          </div>
+        )}
+
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<Dashboard dateParams={dateParams} />} />
+            <Route path="/playback" element={<Playback />} />
+            <Route path="/history" element={<History dateParams={dateParams} />} />
+            <Route path="/recap" element={<Recap dateParams={dateParams} />} />
+          </Routes>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        <div className={`app ${isMobile ? 'mobile' : 'desktop'}`}>
-          <aside
-            id="sidebar"
-            className={`sidebar ${sidebarOpen ? '' : 'collapsed'}`}
-            aria-hidden={isMobile && !sidebarOpen}
-          >
-            <div className="sidebar-brand">
-              <h1>Roon Dashboard</h1>
-            </div>
-            <nav className="sidebar-nav">
-              <NavLink to="/" end onClick={closeSidebarOnMobile}>Dashboard</NavLink>
-              <NavLink to="/playback" onClick={closeSidebarOnMobile}>Playback</NavLink>
-              <NavLink to="/history" onClick={closeSidebarOnMobile}>History</NavLink>
-              <NavLink to="/recap" onClick={closeSidebarOnMobile}>Recap</NavLink>
-            </nav>
-          </aside>
-
-          {isMobile && sidebarOpen && (
-            <button
-              type="button"
-              className="sidebar-backdrop"
-              aria-label="Close menu"
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
-
-          <main className={`main ${sidebarOpen ? '' : 'expanded'}`}>
-            <header className="topbar">
-              <button
-                className="sidebar-toggle"
-                onClick={toggleSidebar}
-                aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
-                aria-expanded={sidebarOpen}
-                aria-controls="sidebar"
-              >
-                <span className="hamburger-icon">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </span>
-              </button>
-              {isMobile ? (
-                <div className="mobile-topbar-main">
-                  <span className="mobile-page-title">Roon Dashboard</span>
-                  <button
-                    type="button"
-                    className={`mobile-filter-toggle ${mobileFiltersOpen ? 'active' : ''}`}
-                    onClick={toggleMobileFilters}
-                    aria-expanded={mobileFiltersOpen}
-                    aria-controls="mobile-filters"
-                  >
-                    Date Range
-                  </button>
-                </div>
-              ) : (
-                <DateRangePicker value={dateParams} onChange={setDateParams} />
-              )}
-            </header>
-
-            {isMobile && mobileFiltersOpen && (
-              <div id="mobile-filters" className="mobile-filters-panel">
-                <DateRangePicker value={dateParams} onChange={setDateParams} />
-              </div>
-            )}
-
-            <div className="content">
-              <Routes>
-                <Route path="/" element={<Dashboard dateParams={dateParams} />} />
-                <Route path="/playback" element={<Playback />} />
-                <Route path="/history" element={<History dateParams={dateParams} />} />
-                <Route path="/recap" element={<Recap dateParams={dateParams} />} />
-              </Routes>
-            </div>
-          </main>
-        </div>
+        <AppContent />
       </BrowserRouter>
     </ErrorBoundary>
   );
