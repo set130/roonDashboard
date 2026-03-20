@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import History from './components/History';
 import Recap from './components/Recap';
+import Playback from './components/Playback';
 import DateRangePicker from './components/DateRangePicker';
 import ErrorBoundary from './ErrorBoundary';
 import './App.css';
@@ -100,6 +101,7 @@ export default function App() {
             </div>
             <nav className="sidebar-nav">
               <NavLink to="/" end onClick={closeSidebarOnMobile}>Dashboard</NavLink>
+              <NavLink to="/playback" onClick={closeSidebarOnMobile}>Playback</NavLink>
               <NavLink to="/history" onClick={closeSidebarOnMobile}>History</NavLink>
               <NavLink to="/recap" onClick={closeSidebarOnMobile}>Recap</NavLink>
             </nav>
@@ -156,6 +158,7 @@ export default function App() {
             <div className="content">
               <Routes>
                 <Route path="/" element={<Dashboard dateParams={dateParams} />} />
+                <Route path="/playback" element={<Playback />} />
                 <Route path="/history" element={<History dateParams={dateParams} />} />
                 <Route path="/recap" element={<Recap dateParams={dateParams} />} />
               </Routes>
