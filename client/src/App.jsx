@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import History from './components/History';
 import Recap from './components/Recap';
 import Playback from './components/Playback';
+import Library from './components/Library';
 import DateRangePicker from './components/DateRangePicker';
 import ErrorBoundary from './ErrorBoundary';
 import './App.css';
@@ -89,6 +90,7 @@ function AppContent() {
   };
 
   const isPlayback = location.pathname === '/playback';
+  const isLibrary = location.pathname === '/library';
 
   return (
     <div className={`app ${isMobile ? 'mobile' : 'desktop'}`}>
@@ -103,6 +105,7 @@ function AppContent() {
         <nav className="sidebar-nav">
           <NavLink to="/" end onClick={closeSidebarOnMobile}>Dashboard</NavLink>
           <NavLink to="/playback" onClick={closeSidebarOnMobile}>Playback</NavLink>
+          <NavLink to="/library" onClick={closeSidebarOnMobile}>Library</NavLink>
           <NavLink to="/history" onClick={closeSidebarOnMobile}>History</NavLink>
           <NavLink to="/recap" onClick={closeSidebarOnMobile}>Recap</NavLink>
         </nav>
@@ -136,32 +139,45 @@ function AppContent() {
             {isMobile ? (
               <div className="mobile-topbar-main">
                 <span className="mobile-page-title">Roon Dashboard</span>
-                <button
-                  type="button"
-                  className={`mobile-filter-toggle ${mobileFiltersOpen ? 'active' : ''}`}
-                  onClick={toggleMobileFilters}
-                  aria-expanded={mobileFiltersOpen}
-                  aria-controls="mobile-filters"
-                >
-                  Date Range
-                </button>
+                {!isLibrary && (
+                  <button
+                    type="button"
+                    className={`mobile-filter-toggle ${mobileFiltersOpen ? 'active' : ''}`}
+                    onClick={toggleMobileFilters}
+                    aria-expanded={mobileFiltersOpen}
+                    aria-controls="mobile-filters"
+                  >
+                    Date Range
+                  </button>
+                )}
               </div>
             ) : (
-              <DateRangePicker value={dateParams} onChange={setDateParams} />
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                 {isLibrary ? (
+                    <div id="library-topbar-portal-target"></div>
+                 ) : (
+                    <DateRangePicker value={dateParams} onChange={setDateParams} />
+                 )}
+              </div>
             )}
           </header>
         )}
 
-        {!isPlayback && isMobile && mobileFiltersOpen && (
+        {!isPlayback && !isLibrary && isMobile && mobileFiltersOpen && (
           <div id="mobile-filters" className="mobile-filters-panel">
             <DateRangePicker value={dateParams} onChange={setDateParams} />
           </div>
+        )}
+
+        {isLibrary && isMobile && (
+           <div id="library-topbar-portal-target" className="mobile-filters-panel" style={{ padding: '10px' }}></div>
         )}
 
         <div className="content">
           <Routes>
             <Route path="/" element={<Dashboard dateParams={dateParams} />} />
             <Route path="/playback" element={<Playback />} />
+            <Route path="/library" element={<Library />} />
             <Route path="/history" element={<History dateParams={dateParams} />} />
             <Route path="/recap" element={<Recap dateParams={dateParams} />} />
           </Routes>
