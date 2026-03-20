@@ -194,23 +194,13 @@ export default function Library() {
 
     // UI for topbar
     const topbarUI = (
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: '5px', backgroundColor: 'var(--surface-light, #2d2d2d)', padding: '4px', borderRadius: '8px' }}>
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="range-buttons">
                 {CATEGORIES.map(cat => (
                     <button
                         key={cat}
                         onClick={() => setCurrentCategory(cat)}
-                        style={{
-                            background: currentCategory === cat ? 'var(--text, #fff)' : 'transparent',
-                            color: currentCategory === cat ? 'var(--bg, #121212)' : 'var(--text, #fff)',
-                            border: 'none',
-                            padding: '6px 12px',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            fontSize: '0.9rem',
-                            transition: 'all 0.2s'
-                        }}
+                        className={`range-btn ${currentCategory === cat ? 'active' : ''}`}
                     >
                         {cat}
                     </button>
