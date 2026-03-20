@@ -13,6 +13,7 @@ const ROON_LOG_LEVEL = process.env.ROON_LOG_LEVEL || "none";
 let _core = null;
 let _transport = null;
 let _image = null;
+let _browse = null;
 
 const roon = new RoonApi({
   extension_id: "com.roon-dashboard.stats",
@@ -31,6 +32,7 @@ const roon = new RoonApi({
     _core = core;
     _transport = core.services.RoonApiTransport;
     _image = core.services.RoonApiImage;
+    _browse = core.services.RoonApiBrowse;
 
     _transport.subscribe_zones(function (cmd, data) {
       console.log("[Roon] ========================================");
@@ -102,6 +104,7 @@ const roon = new RoonApi({
     _core = null;
     _transport = null;
     _image = null;
+    _browse = null;
     svcStatus.set_status("Disconnected", true);
   },
 });
@@ -162,5 +165,25 @@ function isConnected() {
   return _core !== null;
 }
 
-module.exports = { startRoon, getImage, isConnected, roon };
+function getZones(cb) {
+  if (!_transport) return cb(new Error("Not connected"));
+  _core.services.RoonApiTransport.get_zones(cb);
+}
+
+function control(zone_id, command, cb) {
+  if (!_transport) return cb && cb(new Error("Not connected"));
+  _transport.control(zone_id, command, cb);
+}
+
+function browse(opts, cb) {
+  if (!_browse) return cb(new Error("Not connected"));
+  _browse.browse(opts, cb);
+}
+
+function load(opts, cb) {
+  if (!_browse) return cb(new Error("Not connected"));
+  _browse.load(opts, cb);
+}
+
+module.exports = { startRoon, getImage, isConnected, roon, getZones, control, browse, load };
 

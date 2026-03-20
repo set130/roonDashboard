@@ -56,3 +56,33 @@ export function imageUrl(imageKey, width = 300, height = 300) {
     return `${BASE}/image/${imageKey}?width=${width}&height=${height}`;
 }
 
+export async function controlZone(zoneId, command) {
+    const res = await fetch(`${BASE}/roon/control/${zoneId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command }),
+    });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+}
+
+export async function browse(opts = {}) {
+    const res = await fetch(`${BASE}/roon/browse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(opts),
+    });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+}
+
+export async function load(opts = {}) {
+    const res = await fetch(`${BASE}/roon/load`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(opts),
+    });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+}
+

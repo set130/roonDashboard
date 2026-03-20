@@ -8,6 +8,7 @@ const { getNowPlaying, flushAll } = require("./tracker");
 const statsRoutes = require("./routes/stats");
 const historyRoutes = require("./routes/history");
 const recapRoutes = require("./routes/recap");
+const roonApiRoutes = require("./routes/roonApi");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use("/api/stats", statsRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/recap", recapRoutes);
+app.use("/api/roon", roonApiRoutes);
 
 // Now Playing
 app.get("/api/now-playing", (req, res) => {
