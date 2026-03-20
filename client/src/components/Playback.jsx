@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { getZones, controlZone, imageUrl, browse, load } from '../api/roon';
+import { useState, useEffect, useMemo } from 'react';
+import { getZones, controlZone, imageUrl, browse, load, getTopAlbums, getTopArtists } from '../api/roon';
 import IconButton from '@mui/material/IconButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -20,6 +20,23 @@ export default function Playback() {
     
     // Browse state
     const [browseItems, setBrowseItems] = useState([]);
+    const [sortBy, setSortBy] = useState('Default');
+    const [topStats, setTopStats] = useState({ artists: {}, albums: {} });
+
+    useEffect(() => {
+        Promise.all([
+            getTopArtists({ limit: 1000 }),
+            getTopAlbums({ limit: 1000 })
+        ])
+        .then(([artistsData, albumsData]) => {
+            const artists = {};
+            const albums = {};
+            (artistsData || []).forEach(a => artists[a.artist] = a.count || 0);
+            (albumsData || []).forEach(a => albums[a.album] = a.count || 0);
+            setTopStats({ artists, albums });
+        })
+        .catch(err => console.error("Failed to load stats for sorting", err));
+    }, []);
 
     useEffect(() => {
         let active = true;
@@ -127,6 +144,42 @@ export default function Playback() {
             console.error("Control error", e);
         }
     };
+
+    const sortedBrowseItems = useMemo(() => {
+        if (!browseItems || browseItems.length === 0) return [];
+        if (sortBy === 'Default') return browseItems;
+        
+        return [...browseItems].sort((a, b) => {
+            const titleA = a.title || '';
+            const titleB = b.title || '';
+            const subA = a.subtitle || '';
+            const subB = b.subtitle || '';
+
+            if (sortBy === 'Artist') {
+                return subA.localeCompare(subB) || titleA.localeCompare(titleB);
+            }
+            if (sortBy === 'Album title') {
+                return titleA.localeCompare(titleB);
+            }
+            if (sortBy === 'Most played') {
+                // Check if it's likely an album or artist
+                const scoreA = Math.max(topStats.albums[titleA] || 0, topStats.artists[titleA] || 0);
+                const scoreB = Math.max(topStats.albums[titleB] || 0, topStats.artists[titleB] || 0);
+                return scoreB - scoreA;
+            }
+            if (sortBy === 'Date' || sortBy === 'Date added (if possible)') {
+                // Try to extract year from subtitle (e.g. "Pink Floyd • 1973")
+                const extractYear = (str) => {
+                    const match = str.match(/\b(19|20)\d{2}\b/);
+                    return match ? parseInt(match[0], 10) : 0;
+                };
+                const yearA = extractYear(subA);
+                const yearB = extractYear(subB);
+                return yearB - yearA; // Newest first
+            }
+            return 0;
+        });
+    }, [browseItems, sortBy, topStats]);
 
     const activeZone = data.zones.find(z => z.zone_id === selectedZoneId) || data.zones[0];
     const isPlaying = activeZone?.state === 'playing';
@@ -275,12 +328,26 @@ export default function Playback() {
             <div className="card browse-albums-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h3>Library Browser</h3>
-                    <button 
-                        onClick={() => loadBrowse({ hierarchy: "browse", pop_all: true })}
-                        style={{ background: 'none', border: '1px solid #444', color: '#fff', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
-                    >
-                        Home
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            style={{ padding: '6px', borderRadius: '4px', border: '1px solid #444', backgroundColor: 'var(--surface-light, #2d2d2d)', color: 'var(--text, #fff)' }}
+                        >
+                            <option value="Default">Default</option>
+                            <option value="Artist">Artist</option>
+                            <option value="Most played">Most played</option>
+                            <option value="Date added (if possible)">Date added (if possible)</option>
+                            <option value="Date">Date</option>
+                            <option value="Album title">Album title</option>
+                        </select>
+                        <button 
+                            onClick={() => loadBrowse({ hierarchy: "browse", pop_all: true })}
+                            style={{ background: 'none', border: '1px solid #444', color: '#fff', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                            Home
+                        </button>
+                    </div>
                 </div>
                 <div style={{ 
                     display: 'grid', 
@@ -288,8 +355,8 @@ export default function Playback() {
                     gap: '20px', 
                     marginTop: '20px' 
                 }}>
-                    {browseItems.length === 0 && <p style={{ color: '#888' }}>Loading or empty...</p>}
-                    {browseItems.map(item => (
+                    {sortedBrowseItems.length === 0 && <p style={{ color: '#888' }}>Loading or empty...</p>}
+                    {sortedBrowseItems.map(item => (
                         <div key={item.item_key} className="album-item" style={{
                             backgroundColor: 'var(--surface-light, #2d2d2d)',
                             padding: '10px',
