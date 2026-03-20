@@ -146,57 +146,120 @@ export default function Playback() {
                 {!activeZone ? (
                      <p className="empty-state">Nothing playing right now</p>
                 ) : (
-                    <div className="now-playing-zone">
-                      <div className="np-artwork">
-                        {activeZone.image_key ? (
-                          <img src={imageUrl(activeZone.image_key, 200, 200)} alt={activeZone.album} />
-                        ) : (
-                          <div className="np-artwork-placeholder">♪</div>
-                        )}
-                      </div>
-                      <div className="np-info">
-                        <div className="np-track">{activeZone.track_title || 'No Track'}</div>
-                        <div className="np-artist">{activeZone.artist || 'No Artist'}</div>
-                        <div className="np-album">{activeZone.album || 'No Album'}</div>
-                        <div className="np-zone-name">{activeZone.zone_name}</div>
-                        <div className="np-progress">
-                          <div className="np-progress-bar">
-                            <div
-                              className="np-progress-fill"
-                              style={{ width: `${activeZone.duration_secs ? Math.min((elapsed / activeZone.duration_secs) * 100, 100) : 0}%` }}
-                            />
-                          </div>
-                          <span className="np-time">
-                            {formatTime(elapsed)} / {formatTime(activeZone.duration_secs)}
-                          </span>
+                    <div className="playback-hero" style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+                        <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap' }}>
+                            {/* Big Album Art */}
+                            <div style={{ flex: '1 1 300px', maxWidth: '400px' }}>
+                                {activeZone.image_key ? (
+                                    <img 
+                                        src={imageUrl(activeZone.image_key, 600, 600)} 
+                                        alt={activeZone.album} 
+                                        style={{ 
+                                            width: '100%', 
+                                            height: 'auto', 
+                                            aspectRatio: '1/1', 
+                                            objectFit: 'cover', 
+                                            borderRadius: '8px', 
+                                            boxShadow: '0 8px 24px rgba(0,0,0,0.5)' 
+                                        }} 
+                                    />
+                                ) : (
+                                    <div style={{ 
+                                        width: '100%', 
+                                        aspectRatio: '1/1', 
+                                        backgroundColor: 'var(--surface-light, #333)', 
+                                        borderRadius: '8px', 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center', 
+                                        fontSize: '80px', 
+                                        color: '#666' 
+                                    }}>
+                                        ♪
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Track Info */}
+                            <div style={{ flex: '2 1 300px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                <h2 style={{ fontSize: '2.5rem', marginBottom: '16px', lineHeight: 1.2, fontWeight: 700 }}>
+                                    {activeZone.track_title || 'No Track'}
+                                </h2>
+                                <p style={{ fontSize: '1.5rem', color: 'var(--text-muted, #aaa)', marginBottom: '8px' }}>
+                                    {activeZone.artist || 'No Artist'}
+                                </p>
+                                <p style={{ fontSize: '1.25rem', color: 'var(--text-muted, #888)', marginBottom: '24px' }}>
+                                    {activeZone.album || 'No Album'}
+                                </p>
+                                
+                                {/* Keep the zone name subtly available if they want it */}
+                                <div style={{ marginTop: 'auto', fontSize: '1rem', color: '#666', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ 
+                                        display: 'inline-block', 
+                                        width: '8px', 
+                                        height: '8px', 
+                                        borderRadius: '50%', 
+                                        backgroundColor: activeZone.state === 'playing' ? '#4caf50' : '#f44336' 
+                                    }}></span>
+                                    {activeZone.zone_name} - {activeZone.state}
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="controls" style={{ display: 'flex', gap: '20px', alignItems: 'center', marginTop: '20px' }}>
-                            <IconButton onClick={() => handleAction('previous')} color="inherit" aria-label="Previous">
-                                <SkipPreviousIcon fontSize="large" />
-                            </IconButton>
-                            
-                            <IconButton 
-                                onClick={() => handleAction('playpause')}
-                                sx={{ 
-                                    backgroundColor: 'var(--primary, #d9822b)', 
-                                    color: '#fff',
-                                    '&:hover': {
-                                        backgroundColor: 'var(--primary-dark, #b36b22)'
-                                    },
-                                    width: 60,
-                                    height: 60
-                                }}
-                                aria-label={isPlaying ? "Pause" : "Play"}
-                            >
-                                {isPlaying ? <PauseIcon fontSize="large" /> : <PlayArrowIcon fontSize="large" />}
-                            </IconButton>
-                            
-                            <IconButton onClick={() => handleAction('next')} color="inherit" aria-label="Next">
-                                <SkipNextIcon fontSize="large" />
-                            </IconButton>
+                        {/* Controls & Progress */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '10px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '30px' }}>
+                                <IconButton onClick={() => handleAction('previous')} sx={{ color: 'var(--text, #fff)' }} aria-label="Previous">
+                                    <SkipPreviousIcon sx={{ fontSize: 40 }} />
+                                </IconButton>
+                                
+                                <IconButton 
+                                    onClick={() => handleAction('playpause')}
+                                    sx={{ 
+                                        backgroundColor: 'var(--text, #fff)', 
+                                        color: 'var(--bg, #121212)',
+                                        '&:hover': {
+                                            backgroundColor: '#e0e0e0',
+                                            transform: 'scale(1.05)'
+                                        },
+                                        width: 80,
+                                        height: 80,
+                                        transition: 'all 0.2s ease-in-out'
+                                    }}
+                                    aria-label={isPlaying ? "Pause" : "Play"}
+                                >
+                                    {isPlaying ? <PauseIcon sx={{ fontSize: 48 }} /> : <PlayArrowIcon sx={{ fontSize: 48 }} />}
+                                </IconButton>
+                                
+                                <IconButton onClick={() => handleAction('next')} sx={{ color: 'var(--text, #fff)' }} aria-label="Next">
+                                    <SkipNextIcon sx={{ fontSize: 40 }} />
+                                </IconButton>
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                <span style={{ fontSize: '0.9rem', color: 'var(--text-muted, #aaa)', minWidth: '45px', textAlign: 'right' }}>
+                                    {formatTime(elapsed)}
+                                </span>
+                                <div style={{ 
+                                    flexGrow: 1, 
+                                    height: '6px', 
+                                    backgroundColor: 'var(--surface-light, #333)', 
+                                    borderRadius: '3px', 
+                                    overflow: 'hidden',
+                                    cursor: 'pointer' // Could add seeking later
+                                }}>
+                                    <div style={{ 
+                                        width: `${activeZone.duration_secs ? Math.min((elapsed / activeZone.duration_secs) * 100, 100) : 0}%`, 
+                                        height: '100%', 
+                                        backgroundColor: 'var(--text, #fff)',
+                                        transition: 'width 1s linear'
+                                    }} />
+                                </div>
+                                <span style={{ fontSize: '0.9rem', color: 'var(--text-muted, #aaa)', minWidth: '45px', textAlign: 'left' }}>
+                                    {formatTime(activeZone.duration_secs)}
+                                </span>
+                            </div>
                         </div>
-                      </div>
                     </div>
                 )}
             </div>
