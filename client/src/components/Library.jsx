@@ -66,22 +66,26 @@ export default function Library() {
                 await browse({ hierarchy: "browse", item_key: targetItem.item_key });
                 
                 // 5. Load all items for this category
-                let allItemsMap = new Map(); // Use Map to automatically deduplicate by item_key
+                let allItemsMap = new Map(); // Use Map to automatically deduplicate
+                const getDedupeKey = (item) => `${item.title}|${item.subtitle || ''}`;
                 let offset = 0;
                 const batchSize = 100; // Reduce batch size to prevent hitting API limits/duplicates
                 
                 let listRes = await load({ hierarchy: "browse", offset, count: batchSize });
+                let currentFetchedCount = listRes.items ? listRes.items.length : 0;
+                
                 if (listRes.items) {
-                    listRes.items.forEach(item => allItemsMap.set(item.item_key, item));
+                    listRes.items.forEach(item => allItemsMap.set(getDedupeKey(item), item));
                 }
                 
-                const total = listRes.list?.count || allItemsMap.size;
+                const total = listRes.list?.count || currentFetchedCount;
                 
-                while (allItemsMap.size < total) {
+                while (currentFetchedCount < total) {
                     offset += batchSize;
                     const nextRes = await load({ hierarchy: "browse", offset, count: batchSize });
                     if (nextRes.items && nextRes.items.length > 0) {
-                        nextRes.items.forEach(item => allItemsMap.set(item.item_key, item));
+                        nextRes.items.forEach(item => allItemsMap.set(getDedupeKey(item), item));
+                        currentFetchedCount += nextRes.items.length;
                         // Break if we didn't get as many as we asked for (end of list)
                         if (nextRes.items.length < batchSize) break;
                     } else {
@@ -115,18 +119,21 @@ export default function Library() {
             const res = await browse({ hierarchy: "browse", item_key: itemKey });
             if (res.action === "list") {
                 let allItemsMap = new Map();
+                const getDedupeKey = (item) => `${item.title}|${item.subtitle || ''}`;
                 let offset = 0;
                 const batchSize = 100;
                 let listRes = await load({ hierarchy: "browse", offset, count: batchSize });
+                let currentFetchedCount = listRes.items ? listRes.items.length : 0;
                 if (listRes.items) {
-                    listRes.items.forEach(item => allItemsMap.set(item.item_key, item));
+                    listRes.items.forEach(item => allItemsMap.set(getDedupeKey(item), item));
                 }
-                const total = listRes.list?.count || allItemsMap.size;
-                while (allItemsMap.size < total) {
+                const total = listRes.list?.count || currentFetchedCount;
+                while (currentFetchedCount < total) {
                     offset += batchSize;
                     const nextRes = await load({ hierarchy: "browse", offset, count: batchSize });
                     if (nextRes.items && nextRes.items.length > 0) {
-                        nextRes.items.forEach(item => allItemsMap.set(item.item_key, item));
+                        nextRes.items.forEach(item => allItemsMap.set(getDedupeKey(item), item));
+                        currentFetchedCount += nextRes.items.length;
                         if (nextRes.items.length < batchSize) break;
                     } else {
                         break;
