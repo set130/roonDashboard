@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
-import { getNowPlaying, controlZone, imageUrl, browse, load } from '../api/roon';
+import { getZones, controlZone, imageUrl, browse, load } from '../api/roon';
+import IconButton from '@mui/material/IconButton';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
+import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 
 function formatTime(secs) {
   if (!secs) return '0:00';
@@ -15,20 +20,34 @@ export default function Playback() {
     
     // Browse state
     const [browseItems, setBrowseItems] = useState([]);
-    const [browseLevel, setBrowseLevel] = useState(0);
 
     useEffect(() => {
         let active = true;
         const poll = () => {
-          getNowPlaying()
-            .then((d) => {
-              if (active) {
-                setData(d);
-                if (d.zones.length > 0 && !selectedZoneId) {
-                    setSelectedZoneId(d.zones[0].zone_id);
+          getZones()
+            .then((res) => {
+              if (active && res && res.zones) {
+                const mappedZones = res.zones.map(z => {
+                    const np = z.now_playing;
+                    return {
+                        zone_id: z.zone_id,
+                        zone_name: z.display_name,
+                        state: z.state,
+                        track_title: np?.three_line?.line1 || 'No Track',
+                        artist: np?.three_line?.line2 || 'No Artist',
+                        album: np?.three_line?.line3 || '',
+                        duration_secs: np?.length || 0,
+                        elapsed_secs: np?.seek_position || 0,
+                        image_key: np?.image_key || null,
+                    };
+                });
+                
+                setData({ connected: true, zones: mappedZones });
+                if (mappedZones.length > 0 && !selectedZoneId) {
+                    setSelectedZoneId(mappedZones[0].zone_id);
                 }
                 const newElapsed = {};
-                d.zones.forEach(z => {
+                mappedZones.forEach(z => {
                   newElapsed[z.zone_id] = z.elapsed_secs;
                 });
                 setLocalElapsed(newElapsed);
@@ -37,13 +56,17 @@ export default function Playback() {
             .catch(() => {});
         };
         poll();
-        const pollId = setInterval(poll, 1000); // Poll more frequently for playback
+        const pollId = setInterval(poll, 1000);
 
         const tickId = setInterval(() => {
           setLocalElapsed(prev => {
             const updated = { ...prev };
             Object.keys(updated).forEach(zoneId => {
-              updated[zoneId] = (updated[zoneId] || 0) + 1;
+                // only increment if state is playing
+                const zone = data.zones?.find(z => z.zone_id === zoneId);
+                if (zone && zone.state === 'playing') {
+                    updated[zoneId] = (updated[zoneId] || 0) + 1;
+                }
             });
             return updated;
           });
@@ -54,7 +77,7 @@ export default function Playback() {
           clearInterval(pollId);
           clearInterval(tickId);
         };
-    }, [selectedZoneId]);
+    }, [selectedZoneId, data.zones]);
 
     useEffect(() => {
         // Initial browse load
@@ -81,7 +104,6 @@ export default function Playback() {
         if (!selectedZoneId) return;
         try {
             await controlZone(selectedZoneId, cmd);
-            // instantly update local state for snappiness
             setData(prev => {
                 const newZones = prev.zones.map(z => {
                     if (z.zone_id === selectedZoneId) {
@@ -150,27 +172,29 @@ export default function Playback() {
                         </div>
 
                         <div className="controls" style={{ display: 'flex', gap: '20px', alignItems: 'center', marginTop: '20px' }}>
-                            <button onClick={() => handleAction('previous')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', color: 'inherit' }} title="Previous">⏮</button>
-                            <button 
+                            <IconButton onClick={() => handleAction('previous')} color="inherit" aria-label="Previous">
+                                <SkipPreviousIcon fontSize="large" />
+                            </IconButton>
+                            
+                            <IconButton 
                                 onClick={() => handleAction('playpause')}
-                                style={{ 
-                                    background: 'var(--primary, #d9822b)', 
-                                    border: 'none', 
-                                    borderRadius: '50%', 
-                                    width: '60px', 
-                                    height: '60px', 
-                                    cursor: 'pointer', 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'center',
+                                sx={{ 
+                                    backgroundColor: 'var(--primary, #d9822b)', 
                                     color: '#fff',
-                                    fontSize: '24px'
-                                }} 
-                                title={isPlaying ? "Pause" : "Play"}
+                                    '&:hover': {
+                                        backgroundColor: 'var(--primary-dark, #b36b22)'
+                                    },
+                                    width: 60,
+                                    height: 60
+                                }}
+                                aria-label={isPlaying ? "Pause" : "Play"}
                             >
-                                {isPlaying ? "⏸" : "▶"}
-                            </button>
-                            <button onClick={() => handleAction('next')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', color: 'inherit' }} title="Next">⏭</button>
+                                {isPlaying ? <PauseIcon fontSize="large" /> : <PlayArrowIcon fontSize="large" />}
+                            </IconButton>
+                            
+                            <IconButton onClick={() => handleAction('next')} color="inherit" aria-label="Next">
+                                <SkipNextIcon fontSize="large" />
+                            </IconButton>
                         </div>
                       </div>
                     </div>

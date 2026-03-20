@@ -51,6 +51,10 @@ export function getStatus() {
     return fetchJson(`${BASE}/status`);
 }
 
+export function getZones() {
+    return fetchJson(`${BASE}/roon/zones`);
+}
+
 export function imageUrl(imageKey, width = 300, height = 300) {
     if (!imageKey) return null;
     return `${BASE}/image/${imageKey}?width=${width}&height=${height}`;
