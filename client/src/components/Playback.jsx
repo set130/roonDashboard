@@ -105,16 +105,33 @@ export default function Playback() {
         try {
             const res = await browse(opts);
             if (res.action === "list") {
-                const listRes = await load({ hierarchy: "browse", offset: 0, set_display_offset: 0 });
-                let items = listRes.items || [];
+                let allItems = [];
+                let offset = 0;
+                const batchSize = 500; // Load larger chunks to reduce round trips
+                
+                let listRes = await load({ hierarchy: "browse", offset, count: batchSize, set_display_offset: offset });
+                if (listRes.items) allItems.push(...listRes.items);
+                
+                const total = listRes.list?.count || allItems.length;
+                
+                // Fetch the rest if there are more
+                while (allItems.length < total) {
+                    offset += batchSize;
+                    const nextRes = await load({ hierarchy: "browse", offset, count: batchSize });
+                    if (nextRes.items && nextRes.items.length > 0) {
+                        allItems.push(...nextRes.items);
+                    } else {
+                        break;
+                    }
+                }
                 
                 // If we are at the root level, filter out unwanted items
                 if (!opts.item_key) {
                     const unwantedTitles = ["My Live Radio", "Genres", "TIDAL", "Qobuz", "Settings"];
-                    items = items.filter(item => !unwantedTitles.includes(item.title));
+                    allItems = allItems.filter(item => !unwantedTitles.includes(item.title));
                 }
                 
-                setBrowseItems(items);
+                setBrowseItems(allItems);
             }
         } catch (e) {
             console.error("Browse error", e);
@@ -171,7 +188,7 @@ export default function Playback() {
                 if (scoreA !== scoreB) return scoreB - scoreA;
                 return titleA.localeCompare(titleB);
             }
-            if (sortBy === 'Date' || sortBy === 'Date added') {
+            if (sortBy === 'Date') {
                 // Try to extract year from subtitle or title (e.g. "Pink Floyd • 1973")
                 const extractYear = (str) => {
                     const match = str.match(/\b(19|20)\d{2}\b/);
@@ -342,7 +359,6 @@ export default function Playback() {
                             <option value="Default">Default</option>
                             <option value="Artist">Artist</option>
                             <option value="Most played">Most played</option>
-                            <option value="Date added">Date added</option>
                             <option value="Date">Date</option>
                             <option value="Album title">Album title</option>
                         </select>
