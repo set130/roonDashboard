@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getZones, controlZone, imageUrl } from '../api/roon';
+import { getZones, controlZone, seekZone, imageUrl } from '../api/roon';
 import IconButton from '@mui/material/IconButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -75,6 +75,27 @@ export default function Playback() {
           clearInterval(tickId);
         };
     }, [selectedZoneId, data.zones]);
+
+    const handleSeek = async (e) => {
+        if (!selectedZoneId) return;
+        const activeZone = data.zones.find(z => z.zone_id === selectedZoneId) || data.zones[0];
+        if (!activeZone || !activeZone.duration_secs) return;
+        
+        const rect = e.currentTarget.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+        
+        const targetSeconds = Math.floor(percentage * activeZone.duration_secs);
+        
+        // Optimistic UI update
+        setLocalElapsed(prev => ({ ...prev, [selectedZoneId]: targetSeconds }));
+        
+        try {
+            await seekZone(selectedZoneId, targetSeconds);
+        } catch (error) {
+            console.error("Seek error", error);
+        }
+    };
 
     const handleAction = async (cmd) => {
         if (!selectedZoneId) return;
@@ -216,14 +237,17 @@ export default function Playback() {
                                 <span style={{ fontSize: '0.9rem', color: 'var(--text-muted, #aaa)', minWidth: '45px', textAlign: 'right' }}>
                                     {formatTime(elapsed)}
                                 </span>
-                                <div style={{ 
-                                    flexGrow: 1, 
-                                    height: '6px', 
-                                    backgroundColor: 'var(--surface-light, #333)', 
-                                    borderRadius: '3px', 
-                                    overflow: 'hidden',
-                                    cursor: 'pointer' 
-                                }}>
+                                <div 
+                                    onClick={handleSeek}
+                                    style={{ 
+                                        flexGrow: 1, 
+                                        height: '6px', 
+                                        backgroundColor: 'var(--surface-light, #333)', 
+                                        borderRadius: '3px', 
+                                        overflow: 'hidden',
+                                        cursor: 'pointer' 
+                                    }}
+                                >
                                     <div style={{ 
                                         width: `${activeZone.duration_secs ? Math.min((elapsed / activeZone.duration_secs) * 100, 100) : 0}%`, 
                                         height: '100%', 

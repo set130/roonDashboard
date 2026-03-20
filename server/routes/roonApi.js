@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { getZones, control, browse, load, isConnected } = require("../roon");
+const { getZones, control, seek, browse, load, isConnected } = require("../roon");
 
 router.get("/zones", (req, res) => {
   if (!isConnected()) return res.status(503).json({ error: "Roon not connected" });
@@ -21,6 +21,19 @@ router.post("/control/:zone_id", (req, res) => {
     if (err && typeof err === 'object') return res.status(500).json({ error: err.message || "Control failed" });
     if (err) return res.status(500).json({ error: err });
     res.json({ success: true, command, zone_id });
+  });
+});
+
+router.post("/seek/:zone_id", (req, res) => {
+  if (!isConnected()) return res.status(503).json({ error: "Roon not connected" });
+  
+  const { zone_id } = req.params;
+  const { how = "absolute", seconds } = req.body;
+  
+  seek(zone_id, how, seconds, (err) => {
+    if (err && typeof err === 'object') return res.status(500).json({ error: err.message || "Seek failed" });
+    if (err) return res.status(500).json({ error: err });
+    res.json({ success: true, how, seconds, zone_id });
   });
 });
 

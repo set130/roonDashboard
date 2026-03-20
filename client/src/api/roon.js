@@ -70,6 +70,16 @@ export async function controlZone(zoneId, command) {
     return res.json();
 }
 
+export async function seekZone(zoneId, seconds, how = 'absolute') {
+    const res = await fetch(`${BASE}/roon/seek/${zoneId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seconds, how }),
+    });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+}
+
 export async function browse(opts = {}) {
     const res = await fetch(`${BASE}/roon/browse`, {
         method: 'POST',

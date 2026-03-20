@@ -175,6 +175,11 @@ function control(zone_id, command, cb) {
   _transport.control(zone_id, command, cb);
 }
 
+function seek(zone_id, how, seconds, cb) {
+  if (!_transport) return cb && cb(new Error("Not connected"));
+  _transport.seek(zone_id, how, seconds, cb);
+}
+
 function browse(opts, cb) {
   if (!_browse) return cb(new Error("Not connected"));
   _browse.browse(opts, cb);
@@ -185,5 +190,5 @@ function load(opts, cb) {
   _browse.load(opts, cb);
 }
 
-module.exports = { startRoon, getImage, isConnected, roon, getZones, control, browse, load };
+module.exports = { startRoon, getImage, isConnected, roon, getZones, control, seek, browse, load };
 
