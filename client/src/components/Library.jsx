@@ -66,27 +66,31 @@ export default function Library() {
                 await browse({ hierarchy: "browse", item_key: targetItem.item_key });
                 
                 // 5. Load all items for this category
-                let allItems = [];
+                let allItemsMap = new Map(); // Use Map to automatically deduplicate by item_key
                 let offset = 0;
-                const batchSize = 500;
+                const batchSize = 100; // Reduce batch size to prevent hitting API limits/duplicates
                 
                 let listRes = await load({ hierarchy: "browse", offset, count: batchSize });
-                if (listRes.items) allItems.push(...listRes.items);
+                if (listRes.items) {
+                    listRes.items.forEach(item => allItemsMap.set(item.item_key, item));
+                }
                 
-                const total = listRes.list?.count || allItems.length;
+                const total = listRes.list?.count || allItemsMap.size;
                 
-                while (allItems.length < total) {
+                while (allItemsMap.size < total) {
                     offset += batchSize;
                     const nextRes = await load({ hierarchy: "browse", offset, count: batchSize });
                     if (nextRes.items && nextRes.items.length > 0) {
-                        allItems.push(...nextRes.items);
+                        nextRes.items.forEach(item => allItemsMap.set(item.item_key, item));
+                        // Break if we didn't get as many as we asked for (end of list)
+                        if (nextRes.items.length < batchSize) break;
                     } else {
                         break;
                     }
                 }
 
                 if (isMounted) {
-                    setBrowseItems(allItems);
+                    setBrowseItems(Array.from(allItemsMap.values()));
                 }
             } catch (e) {
                 console.error("Failed to load category", e);
@@ -110,22 +114,25 @@ export default function Library() {
             setLoading(true);
             const res = await browse({ hierarchy: "browse", item_key: itemKey });
             if (res.action === "list") {
-                let allItems = [];
+                let allItemsMap = new Map();
                 let offset = 0;
-                const batchSize = 500;
+                const batchSize = 100;
                 let listRes = await load({ hierarchy: "browse", offset, count: batchSize });
-                if (listRes.items) allItems.push(...listRes.items);
-                const total = listRes.list?.count || allItems.length;
-                while (allItems.length < total) {
+                if (listRes.items) {
+                    listRes.items.forEach(item => allItemsMap.set(item.item_key, item));
+                }
+                const total = listRes.list?.count || allItemsMap.size;
+                while (allItemsMap.size < total) {
                     offset += batchSize;
                     const nextRes = await load({ hierarchy: "browse", offset, count: batchSize });
                     if (nextRes.items && nextRes.items.length > 0) {
-                        allItems.push(...nextRes.items);
+                        nextRes.items.forEach(item => allItemsMap.set(item.item_key, item));
+                        if (nextRes.items.length < batchSize) break;
                     } else {
                         break;
                     }
                 }
-                setBrowseItems(allItems);
+                setBrowseItems(Array.from(allItemsMap.values()));
             }
         } catch (e) {
             console.error("Failed to browse item", e);
