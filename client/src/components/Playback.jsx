@@ -89,7 +89,15 @@ export default function Playback() {
             const res = await browse(opts);
             if (res.action === "list") {
                 const listRes = await load({ hierarchy: "browse", offset: 0, set_display_offset: 0 });
-                setBrowseItems(listRes.items || []);
+                let items = listRes.items || [];
+                
+                // If we are at the root level, filter out unwanted items
+                if (!opts.item_key) {
+                    const unwantedTitles = ["My Live Radio", "Genres", "TIDAL", "Qobuz", "Settings"];
+                    items = items.filter(item => !unwantedTitles.includes(item.title));
+                }
+                
+                setBrowseItems(items);
             }
         } catch (e) {
             console.error("Browse error", e);
@@ -207,7 +215,7 @@ export default function Playback() {
                         </div>
 
                         {/* Controls & Progress */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '10px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '-10px', paddingBottom: '20px' }}>
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '30px' }}>
                                 <IconButton onClick={() => handleAction('previous')} sx={{ color: 'var(--text, #fff)' }} aria-label="Previous">
                                     <SkipPreviousIcon sx={{ fontSize: 40 }} />
