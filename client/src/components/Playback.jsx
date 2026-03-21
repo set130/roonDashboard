@@ -117,6 +117,22 @@ export default function Playback() {
         }
     };
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // Don't trigger if user is typing in an input or select
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+                return;
+            }
+            if (e.code === 'Space') {
+                e.preventDefault();
+                handleAction('playpause');
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedZoneId]); // Depend on selectedZoneId so handleAction uses the current one
+
     const activeZone = data.zones.find(z => z.zone_id === selectedZoneId) || data.zones[0];
     const isPlaying = activeZone?.state === 'playing';
     const elapsed = activeZone ? (localElapsed[activeZone.zone_id] || activeZone.elapsed_secs || 0) : 0;
